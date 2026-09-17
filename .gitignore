@@ -9,3 +9,5 @@ temp
 .cursor/
 skills-lock.json
 skills/
+
+context/foundation/prd-*.md
