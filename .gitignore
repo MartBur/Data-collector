@@ -13,3 +13,6 @@ skills/
 context/foundation/prd-*.md
 staticfiles/
 .env
+db.sqlite3
+__pycache__/
+*.py[cod]

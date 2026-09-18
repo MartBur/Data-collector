@@ -22,7 +22,7 @@ Use uv only. Deploy on Render from @render.yaml (web Free + Postgres Free) with 
 
 - `manage.py` and `DataCollector/` — Django project package. `urlpatterns` is admin-only (@DataCollector/urls.py). `INSTALLED_APPS` is contrib-only.
 - @pyproject.toml / @uv.lock — distribution name `workspace`, `django>=6.1.1`, `requires-python = ">=3.14"` (also @.python-version).
-- Scaffold record: @context/changes/bootstrap-verification/verification.md. Local `db.sqlite3` is not listed in @.gitignore; leave it untracked.
+- Scaffold record: @context/changes/bootstrap-verification/verification.md. Local `db.sqlite3` is ignored in @.gitignore (production uses Render Postgres).
 
 ## Coding style
 
