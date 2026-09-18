@@ -38,9 +38,9 @@ flowchart LR
 - [x] **Blueprint (agent):** dodać `render.yaml` — web `free` + Postgres `free`, `uv sync --frozen`, migracje w `buildCommand`, bez cron / previews / `preDeployCommand`
 - [x] **Gitignore i AGENTS.md (agent):** dopisać `staticfiles/` i `.env` do `.gitignore`; zaktualizować wzmiankę o `render.yaml` w `AGENTS.md`
 - [x] **Smoke lokalny (agent):** `check`, `migrate`, `collectstatic`, `runserver` `/admin/`
-- [ ] **Commit i push (po zgodzie):** wypchnąć na GitHub
-- [ ] **Blueprint apply (Ty):** Dashboard → New → Blueprint → to repo / `main` → obie instancje **Free**
-- [ ] **Weryfikacja i superuser:** poczekać na spin-up (~1 min), `/admin/login/`; superuser z `DJANGO_SUPERUSER_*` (na Free nie ma Shell ani one-off jobs)
+- [x] **Commit i push (po zgodzie):** wypchnąć na GitHub (PR #3 merged to `main`)
+- [x] **Blueprint apply (Ty):** Dashboard → New → Blueprint → to repo / `main` → obie instancje **Free** (`https://datacollector-n0w9.onrender.com`)
+- [x] **Weryfikacja i superuser:** `/admin/login/` 200 z CSS (WhiteNoise); logowanie superuserem zostaje po Twojej stronie
 
 ## Poza zakresem tego wdrożenia
 
@@ -168,7 +168,7 @@ Jeśli `uv sync --frozen` spróbuje zbudować pakiet `workspace` (`uv_build` + [
 
 ## 4. Gitignore (agent)
 
-Dopisać do [`.gitignore`](../../../.gitignore): `staticfiles/` i `.env`. **Nie** dodawać `db.sqlite3` (reguła w [`AGENTS.md`](../../../AGENTS.md): zostaje untracked).
+Dopisać do [`.gitignore`](../../../.gitignore): `staticfiles/`, `.env` i `db.sqlite3`.
 
 Jedna linia w [`AGENTS.md`](../../../AGENTS.md): jest `render.yaml`; auto-deploy nadal Render, nie Actions.
 
