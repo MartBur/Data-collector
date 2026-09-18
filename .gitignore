@@ -11,3 +11,5 @@ skills-lock.json
 skills/
 
 context/foundation/prd-*.md
+staticfiles/
+.env

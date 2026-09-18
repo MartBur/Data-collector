@@ -16,7 +16,7 @@ Data Collector is a Django 6.1.1 web app managed with uv on Python 3.14. Product
 - `uv run python manage.py test` — Django test runner; no test modules exist yet
 - `uv add <package>` — add a dependency and update @uv.lock
 
-Use uv only. Fly.io and GitHub Actions auto-deploy are planned in @context/foundation/tech-stack.md; there is no `fly.toml` and no `.github/workflows/` yet.
+Use uv only. Deploy on Render from @render.yaml (web Free + Postgres Free) with Git auto-deploy on merge to main; GitHub Actions remains the CI provider (@context/foundation/tech-stack.md, @context/foundation/infrastructure.md). There is no `.github/workflows/` yet.
 
 ## Project structure
 
