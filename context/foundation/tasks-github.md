@@ -47,20 +47,21 @@ Examples: `S-01: Signed-in user can sign in`, `Decision: Which shops are in the 
 
 | Roadmap ID | Change ID                 | Status   | Issue |
 | ---------- | ------------------------- | -------- | ----- |
-| F-01       | calendar-day-landed-price | blocked  | [#5](https://github.com/MartBur/Data-collector/issues/5) |
+| F-01       | calendar-day-landed-price | ready    | [#5](https://github.com/MartBur/Data-collector/issues/5) |
 | S-01       | account-sign-in           | ready    | [#6](https://github.com/MartBur/Data-collector/issues/6) |
-| S-02       | add-tracked-product       | blocked  | [#7](https://github.com/MartBur/Data-collector/issues/7) |
-| S-03       | product-card-decision     | blocked  | [#8](https://github.com/MartBur/Data-collector/issues/8) |
+| S-02       | add-tracked-product       | proposed | [#7](https://github.com/MartBur/Data-collector/issues/7) |
+| S-03       | product-card-decision     | proposed | [#8](https://github.com/MartBur/Data-collector/issues/8) |
 | S-04       | favorites-lowest-today    | proposed | [#9](https://github.com/MartBur/Data-collector/issues/9) |
 | S-05       | edit-tracked-product      | proposed | [#10](https://github.com/MartBur/Data-collector/issues/10) |
-| —          | shop-set decision         | question | [#11](https://github.com/MartBur/Data-collector/issues/11) |
+| —          | shop-set decision         | settled  | [#11](https://github.com/MartBur/Data-collector/issues/11) |
 
-[#6](https://github.com/MartBur/Data-collector/issues/6) is the only issue with no blockers. [#11](https://github.com/MartBur/Data-collector/issues/11) blocks F-01, S-02, and S-03. The timezone question is non-blocking and lives in the F-01 and S-04 bodies.
+Target state after the shop set was named: [#5](https://github.com/MartBur/Data-collector/issues/5) and [#6](https://github.com/MartBur/Data-collector/issues/6) have no blockers. [#11](https://github.com/MartBur/Data-collector/issues/11) is settled: Rossmann, DOZ, Super-Pharm, and Gemini. The timezone question is non-blocking and lives in the F-01 and S-04 bodies.
+
+GitHub still has the previous labels and the blocked-by link from [#11](https://github.com/MartBur/Data-collector/issues/11). The issue mirror is not applied yet.
 
 Blocked-by edges:
 
-- F-01 ← decision
-- S-02 ← S-01, decision
-- S-03 ← S-01, S-02, F-01, decision
+- S-02 ← S-01
+- S-03 ← S-01, S-02, F-01
 - S-04 ← S-01, S-02, F-01
 - S-05 ← S-02
