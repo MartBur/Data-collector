@@ -3,7 +3,7 @@ project: Data Collector
 version: 1
 status: draft
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 prd_version: 5
 main_goal: speed
 top_blocker: decisions
@@ -41,10 +41,10 @@ When a product runs out, the user has to buy the same day, hunts across several 
 
 | ID   | Change ID                   | Outcome (user can …)                                                                                          | Prerequisites    | PRD refs                                 | Status   |
 | ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------- | -------- |
-| F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | blocked  |
+| F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | ready    |
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | ready    |
-| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | blocked  |
-| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | blocked  |
+| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | proposed |
+| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | proposed |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | proposed |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | proposed |
 
@@ -81,10 +81,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** S-01, S-02, S-05
 - **Blockers:** —
 - **Unknowns:**
-  - Which shops are in the fixed set of sites? — Owner: user. Block: yes.
   - Which timezone bounds the calendar day for "today"? — Owner: user. Block: no.
-- **Risk:** This is the only deep investment, because the card and the start page are false if yesterday is labeled today. It stays blocked until the shops are named; the screens that read the price still come later.
-- **Status:** blocked
+- **Risk:** This is the only deep investment, because the card and the start page are false if yesterday is labeled today. Prices are read from Rossmann, DOZ, Super-Pharm, and Gemini. The screens that read the price still come later.
+- **Status:** ready
 
 ## Slices
 
@@ -108,10 +107,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** S-01
 - **Parallel with:** F-01
 - **Blockers:** —
-- **Unknowns:**
-  - Which shops are in the fixed set of sites? — Owner: user. Block: yes.
-- **Risk:** The tracked list is the source of the shop pages the price record and the card read. It sits before the card so the north star has a product to open, and it stays blocked on the same shop decision.
-- **Status:** blocked
+- **Unknowns:** —
+- **Risk:** The tracked list is the source of the shop pages the price record and the card read. It sits before the card so the north star has a product to open. Those pages come from Rossmann, DOZ, Super-Pharm, and Gemini, and this slice becomes plannable once sign-in is done.
+- **Status:** proposed
 
 ### S-03: Product card with history and shop link
 
@@ -121,10 +119,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** S-01, S-02, F-01
 - **Parallel with:** S-04, S-05
 - **Blockers:** —
-- **Unknowns:**
-  - Which shops are in the fixed set of sites? — Owner: user. Block: yes.
-- **Risk:** This is the north star. It is as early as sign-in, a tracked product, and a recorded price allow, and it stays blocked until the shops are named — otherwise today's prices and the chart cannot be planned.
-- **Status:** blocked
+- **Unknowns:** —
+- **Risk:** This is the north star. It is as early as sign-in, a tracked product, and a recorded price allow. Today's prices and the chart read Rossmann, DOZ, Super-Pharm, and Gemini.
+- **Status:** proposed
 
 ### S-04: Favorites with today's lowest price
 
@@ -156,22 +153,23 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 | Roadmap ID | Change ID                 | Suggested issue title                                              | Ready for `/10x-plan` | Notes                                      | Issue |
 | ---------- | ------------------------- | ------------------------------------------------------------------ | --------------------- | ------------------------------------------ | ----- |
-| F-01       | calendar-day-landed-price | Record one landed shop price per calendar day                     | no                    | Blocked until the shop set is named        | [#5](https://github.com/MartBur/Data-collector/issues/5) |
+| F-01       | calendar-day-landed-price | Record one landed shop price per calendar day                     | yes                   | Run `/10x-plan calendar-day-landed-price`  | [#5](https://github.com/MartBur/Data-collector/issues/5) |
 | S-01       | account-sign-in           | Signed-in user can sign in                                        | yes                   | Run `/10x-plan account-sign-in`            | [#6](https://github.com/MartBur/Data-collector/issues/6) |
-| S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | no                    | Blocked until the shop set is named        | [#7](https://github.com/MartBur/Data-collector/issues/7) |
-| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | no          | Blocked until the shop set is named        | [#8](https://github.com/MartBur/Data-collector/issues/8) |
+| S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | no                    | Waits on S-01. Shop set is named           | [#7](https://github.com/MartBur/Data-collector/issues/7) |
+| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | no          | Waits on S-01, S-02, and F-01. Shop set is named | [#8](https://github.com/MartBur/Data-collector/issues/8) |
 | S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | no                    | Waits on S-01, S-02, and F-01              | [#9](https://github.com/MartBur/Data-collector/issues/9) |
 | S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | no                    | Waits on S-02                              | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 
 ## Open Roadmap Questions
 
-1. **Which shops are in scope, concretely?** — Passed over for now. Settled: each item maps to two or three specific shop pages the owner adds from a small fixed set of sites. Still open: the sites are not named. Owner: user. Block: F-01, S-02, S-03. Issue: [#11](https://github.com/MartBur/Data-collector/issues/11).
-2. **Which timezone bounds the calendar day for a price labeled today?** — Owner: user. Block: no. Planning may assume the owner's local day (Europe/Warsaw) until this is overridden. A previous calendar day must not be labeled today.
+1. **Which timezone bounds the calendar day for a price labeled today?** — Owner: user. Block: no. Planning may assume the owner's local day (Europe/Warsaw) until this is overridden. A previous calendar day must not be labeled today.
+
+Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), DOZ (https://www.doz.pl/), Super-Pharm (https://www.superpharm.pl/), and Gemini (https://gemini.pl/). Each tracked item still uses two or three pages from this set. Issue: [#11](https://github.com/MartBur/Data-collector/issues/11).
 
 ## Parked
 
 - **USD exchange-rate or YouTube subscriber tracking** — Why parked: PRD Non-Goals; this version is restock prices for watched goods.
-- **Arbitrary shop URLs per product** — Why parked: PRD Non-Goals; each item is two or three pages from a small fixed set of sites.
+- **Arbitrary shop URLs per product** — Why parked: PRD Non-Goals; each item is two or three pages from Rossmann, DOZ, Super-Pharm, and Gemini.
 - **Shared curation of the tracked list** — Why parked: PRD Non-Goals; only the list owner adds, changes, or removes entries (FR-012, FR-013).
 - **Product description and availability on the card** — Why parked: PRD Non-Goals; the card is name, landed prices, chart, and outbound link.
 - **Self-service favoriting from a product page (FR-009)** — Why parked: PRD Non-Goals and speed; the start page reads a preloaded list.

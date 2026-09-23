@@ -108,7 +108,7 @@ A broader audience later. Not the MVP primary.
 
 For a favorite product, the app points to the shop with the lowest price today, shows how today's prices compare across the other shops, and whether that lowest price is low against the product's history.
 
-Inputs the user cares about: each shop's price for today after promo and shipping, plus the prices already recorded for that product (the historical minimum is the lowest of those recorded prices). Which shops apply is decided per product — two or three specific shop pages per item, chosen by me.
+Inputs the user cares about: each shop's price for today after promo and shipping, plus the prices already recorded for that product (the historical minimum is the lowest of those recorded prices). Which shops apply is decided per product — two or three specific shop pages per item, chosen by me, from this fixed set: Rossmann (https://www.rossmann.pl/), DOZ (https://www.doz.pl/), Super-Pharm (https://www.superpharm.pl/), and Gemini (https://gemini.pl/).
 
 Output: which shop is cheapest today on that landed basis, today's landed prices side by side, and the lowest recorded price shown next to today's so the user can judge. A product counts as worth buying now when today's lowest landed price is the lowest in that product's recorded history — but the explicit signal for that is nice-to-have (FR-007), so the must-have MVP shows the two numbers next to each other and leaves the call to the user.
 
@@ -129,7 +129,7 @@ The all-products view is shared between the roles: it is the guest entry point, 
 ## Non-Goals
 
 - No USD exchange-rate or YouTube subscriber tracking — out of this version; the product is restock prices for watched goods.
-- No arbitrary shop URLs per product — the pages I add for an item are two or three specific shop pages from a small fixed set of sites, not any shop on the web.
+- No arbitrary shop URLs per product — the pages I add for an item are two or three specific shop pages from Rossmann, DOZ, Super-Pharm, and Gemini, not any shop on the web.
 - No shared curation — other logged-in users cannot add, change, or remove tracked products or their shop pages; the list stays mine (FR-012, FR-013).
 - No product description and no availability field on the card — name, landed prices, chart, and outbound link only.
 - No self-service favoriting in the must-have flow — the start page reads a preloaded list; adding favorites from a product page (FR-009) is nice-to-have.
@@ -138,4 +138,4 @@ The all-products view is shared between the roles: it is the guest entry point, 
 
 ## Open Questions
 
-1. **Which shops are in scope, concretely?** — Passed over for now. Settled: each item maps to two or three specific shop pages I add from a small fixed set of sites. Still open: the sites are not named. Owner: user. Block: no for the PRD; needed before FR-004, FR-005, FR-008 and FR-012 can be built.
+(none)
