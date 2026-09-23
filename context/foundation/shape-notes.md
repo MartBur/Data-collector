@@ -2,7 +2,7 @@
 project: "Data Collector"
 context_type: greenfield
 created: 2026-09-14
-updated: 2026-09-14
+updated: 2026-09-23
 product_type: web-app
 target_scale:
   users: small
@@ -17,7 +17,7 @@ checkpoint:
     - topic: pain category
       decision: "missing capability (no price history / buy signal) + data trapped on shop pages + workflow friction (manual multi-tab search) + decision paralysis (buy now or not)"
     - topic: insight
-      decision: "history plus promo and shipping on MY products, not a one-shot cheapest-today comparison"
+      decision: "history plus the price after promo on MY products, not a one-shot cheapest-today comparison"
     - topic: primary persona scope
       decision: "MVP primary is myself; a broader audience is a later target, not the first persona"
     - topic: auth strategy
@@ -25,14 +25,14 @@ checkpoint:
     - topic: MVP first flow
       decision: "login → preloaded favorites with today's lowest price → product card (name, shops + today's prices, no description, no availability) → history chart (one line per shop, fixed horizon) → outbound shop link; no guests in this flow; no add-favorite in first flow; ~3 weeks not 2"
     - topic: domain rule details
-      decision: "today's price includes promo and shipping; show recorded historical minimum next to today (user decides); start=cheapest shop, card=shop comparison, chart=history backdrop"
+      decision: "today's price is the current selling price after promo, and shipping is not shown; show recorded historical minimum next to today (user decides); start=cheapest shop, card=shop comparison, chart=history backdrop"
   frs_drafted: 7
   quality_check_status: accepted
 ---
 
 ## Seed idea
 
-Narzędzie dla siebie: obserwowane produkty, historia (1 pomiar na sklep dziennie), wykres, kiedy i gdzie kupić, z promocją i wysyłką. Nowy projekt, Python. Na start kilka produktów i 2–3 konkretne strony; pełna lista sklepów jeszcze nieustalona. Czas: kilkanaście–20+ h/tydz. do końca października, potem jeszcze więcej. Poza MVP: kurs dolara, YT, dowolne sklepy per produkt.
+Narzędzie dla siebie: obserwowane produkty, historia (1 pomiar na sklep dziennie), wykres, kiedy i gdzie kupić, z ceną po promocji, bez kwoty wysyłki. Nowy projekt, Python. Na start kilka produktów i 2–3 konkretne strony; pełna lista sklepów jeszcze nieustalona. Czas: kilkanaście–20+ h/tydz. do końca października, potem jeszcze więcej. Poza MVP: kurs dolara, YT, dowolne sklepy per produkt.
 
 ## Forward: tech-stack
 
@@ -42,11 +42,11 @@ User volunteered: Python. Not a PRD decision — pick up after `/10x-prd`.
 
 When a product suddenly runs out (e.g. shampoo), I have to buy now. I open several shop sites, spend time hunting where it is available and where it is cheapest right now, and I still overpay because I did not buy when it was cheaper.
 
-The useful difference is not a one-shot “cheapest today” list. I need history on my own watched products, with promo and shipping included, so I can tell whether to buy now and in which shop.
+The useful difference is not a one-shot “cheapest today” list. I need history on my own watched products, at the current selling price after promo, so I can tell whether to buy now and in which shop.
 
 Pain categories (all apply): missing capability (no history / buy signal); prices trapped on shop pages; manual multi-tab search; decision paralysis under restock urgency.
 
-At ~100× users the domain rule would stay the same (cheapest landed shop today vs recorded historical minimum); scale is not a reason to change the rule for this MVP.
+At ~100× users the domain rule would stay the same (cheapest shop today at the price after promo vs recorded historical minimum); scale is not a reason to change the rule for this MVP.
 
 ## User & Persona
 
@@ -67,7 +67,7 @@ What a guest can see or do is not specified yet.
 1. **What can a guest do without a full account?** — Owner: user. Block: no (MVP primary is a logged-in self; first flow has no guests).
 2. **How are favorite products preloaded for the first session?** — Owner: user.
 3. **Keep login in MVP despite solo-use friction, or drop it?** — Owner: user. Block: no (FR-001 still written as login).
-4. **What rule makes a product “worth buying now”?** — Owner: user. Block: no (FR-007 is nice-to-have). MVP does not auto-declare “buy now”; it shows today’s landed lowest vs the lowest recorded price and the user decides.
+4. **What rule makes a product “worth buying now”?** — Owner: user. Block: no (FR-007 is nice-to-have). MVP does not auto-declare “buy now”; it shows today’s lowest price after promo vs the lowest recorded price and the user decides.
 
 ## Success Criteria
 
@@ -85,11 +85,11 @@ What a guest can see or do is not specified yet.
 
 For a favorite product, the app points to the shop with the lowest price today, shows how today’s prices compare across the other shops, and whether that lowest price is low against the product’s history.
 
-Inputs the user cares about: each shop’s price for today after promo and shipping, plus the prices already recorded for that product (the historical minimum is the lowest of those recorded prices).
+Inputs the user cares about: each shop’s price for today at the current selling price after promo, plus the prices already recorded for that product (the historical minimum is the lowest of those recorded prices).
 
-Output: which shop is cheapest today on that landed basis, today’s landed prices side by side, and the lowest recorded price shown next to today’s so the user can judge — the product does not declare “buy now” in MVP.
+Output: which shop is cheapest today at that price, today’s prices after promo side by side, and the lowest recorded price shown next to today’s so the user can judge — the product does not declare “buy now” in MVP.
 
-The user meets this on the start page (cheapest shop / lowest landed price today), on the product card (comparison across shops), and on the chart (history as backdrop).
+The user meets this on the start page (cheapest shop / lowest price after promo today), on the product card (comparison across shops), and on the chart (history as backdrop).
 
 ## Non-Functional Requirements
 
@@ -100,7 +100,8 @@ The user meets this on the start page (cheapest shop / lowest landed price today
 
 - No USD exchange-rate or YouTube subscriber tracking — out of this version; the product is restock prices for watched goods.
 - No arbitrary shop URLs per product — only a small set of specific sites (a couple to three), not “any store”.
-- No product description and no availability field on the card — name, landed prices, chart, and outbound link only.
+- No product description and no availability field on the card — name, prices after promo, chart, and outbound link only.
+- No shipping amount on the recorded or shown price — the price is the current selling price after promo.
 
 ## Functional Requirements
 
@@ -113,8 +114,8 @@ The user meets this on the start page (cheapest shop / lowest landed price today
   > Socrates: No counter-argument; it stands as written.
 - FR-003: Logged-in user can open a product card that shows the product name. Priority: must-have
   > Socrates: Counter-argument considered: the name is already on the list, so the card is an extra click. Resolution: kept; shop prices and the chart need a separate screen.
-- FR-004: Logged-in user can see the shops for that product with each shop’s price for today, including promo and shipping. Priority: must-have
-  > Socrates: No counter-argument; it stands as written.
+- FR-004: Logged-in user can see the shops for that product with each shop’s price for today, at the current selling price after promo. Priority: must-have
+  > Socrates: No counter-argument on the shop comparison; it stands as written. Updated 2026-09-23: shipping is not shown and is not added to the price.
 
 ### History and outbound
 - FR-005: Logged-in user can see a price-history chart for the product with one line per shop and a fixed time horizon. Priority: must-have
