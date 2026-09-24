@@ -3,7 +3,7 @@ project: Data Collector
 version: 1
 status: draft
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-24
 prd_version: 5
 main_goal: speed
 top_blocker: decisions
@@ -41,7 +41,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 
 | ID   | Change ID                   | Outcome (user can …)                                                                                          | Prerequisites    | PRD refs                                 | Status   |
 | ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------- | -------- |
-| F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | ready    |
+| F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | in-progress |
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | ready    |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | proposed |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | proposed |
@@ -83,7 +83,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Which timezone bounds the calendar day for "today"? — Owner: user. Block: no.
 - **Risk:** This is the only deep investment, because the card and the start page are false if yesterday is labeled today. Prices are read from Rossmann, DOZ, Super-Pharm, and Gemini. The screens that read the price still come later.
-- **Status:** ready
+- **Status:** in-progress
 
 ## Slices
 
