@@ -232,20 +232,20 @@ There is no existing price data. The Phase 1 migration creates the product, shop
 
 #### Automated
 
-- [x] 3.1 Reader tests pass for saved HTML of Rossmann, DOZ, Super-Pharm, and Gemini, including a page with no price: `uv run python manage.py test prices.tests.test_readers`
+- [x] 3.1 Reader tests pass for saved HTML of Rossmann, DOZ, Super-Pharm, and Gemini, including a page with no price: `uv run python manage.py test prices.tests.test_readers` — 74d68c8
 
 #### Manual
 
-- [x] 3.2 A live page that no longer matches its saved HTML is checked by hand before the fixture is updated
+- [x] 3.2 A live page that no longer matches its saved HTML is checked by hand before the fixture is updated — 74d68c8
 
 ### Phase 4: Local record commands
 
 #### Automated
 
-- [ ] 4.1 Command tests pass without network: all-shops and one single-shop command store a changed price, skip an unchanged same-day price, and leave a gap after one failed retry: `uv run python manage.py test prices.tests.test_commands`
+- [x] 4.1 Command tests pass without network: all-shops and one single-shop command store a changed price, skip an unchanged same-day price, and leave a gap after one failed retry: `uv run python manage.py test prices.tests.test_commands`
 
 #### Manual
 
-- [ ] 4.2 Run `uv run python manage.py record_prices` for a product entered in admin and confirm today's amount is stored
-- [ ] 4.3 Run `uv run python manage.py record_rossmann_prices` and confirm other shops are untouched
-- [ ] 4.4 Run that shop command again while the price is unchanged and confirm no extra row
+- [x] 4.2 Run `uv run python manage.py record_prices` for a product entered in admin and confirm today's amount is stored
+- [x] 4.3 Run `uv run python manage.py record_rossmann_prices` and confirm other shops are untouched
+- [x] 4.4 Run that shop command again while the price is unchanged and confirm no extra row

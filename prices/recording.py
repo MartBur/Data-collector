@@ -2,6 +2,8 @@ from datetime import date
 from decimal import Decimal
 from enum import Enum
 
+from django.db import connection, transaction
+
 from prices.models import PriceObservation, ShopPage
 
 PLN_QUANTUM = Decimal("0.01")
@@ -47,12 +49,16 @@ def record_price(
 ) -> RecordOutcome:
     """Store the first amount for this date, and a later one only when it changes."""
     normalized = _as_pln(amount)
-    latest = latest_observation(shop_page, observed_date)
-    if latest is not None and latest.amount == normalized:
-        return RecordOutcome.UNCHANGED
-    PriceObservation.objects.create(
-        shop_page=shop_page,
-        amount=normalized,
-        observed_date=observed_date,
-    )
+    with transaction.atomic():
+        locked_page = shop_page
+        if connection.features.has_select_for_update:
+            locked_page = ShopPage.objects.select_for_update().get(pk=shop_page.pk)
+        latest = latest_observation(locked_page, observed_date)
+        if latest is not None and latest.amount == normalized:
+            return RecordOutcome.UNCHANGED
+        PriceObservation.objects.create(
+            shop_page=locked_page,
+            amount=normalized,
+            observed_date=observed_date,
+        )
     return RecordOutcome.STORED
