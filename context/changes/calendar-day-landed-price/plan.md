@@ -242,10 +242,10 @@ There is no existing price data. The Phase 1 migration creates the product, shop
 
 #### Automated
 
-- [x] 4.1 Command tests pass without network: all-shops and one single-shop command store a changed price, skip an unchanged same-day price, and leave a gap after one failed retry: `uv run python manage.py test prices.tests.test_commands`
+- [x] 4.1 Command tests pass without network: all-shops and one single-shop command store a changed price, skip an unchanged same-day price, and leave a gap after one failed retry: `uv run python manage.py test prices.tests.test_commands` — 8dfd089
 
 #### Manual
 
-- [x] 4.2 Run `uv run python manage.py record_prices` for a product entered in admin and confirm today's amount is stored
-- [x] 4.3 Run `uv run python manage.py record_rossmann_prices` and confirm other shops are untouched
-- [x] 4.4 Run that shop command again while the price is unchanged and confirm no extra row
+- [x] 4.2 Run `uv run python manage.py record_prices` for a product entered in admin and confirm today's amount is stored — 8dfd089
+- [x] 4.3 Run `uv run python manage.py record_rossmann_prices` and confirm other shops are untouched — 8dfd089
+- [x] 4.4 Run that shop command again while the price is unchanged and confirm no extra row — 8dfd089
