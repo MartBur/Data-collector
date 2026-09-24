@@ -226,17 +226,17 @@ There is no existing price data. The Phase 1 migration creates the product, shop
 
 #### Automated
 
-- [x] 2.1 Recording tests pass and cover first-of-day insert, same-day unchanged skip, same-day change insert, latest-of-day read, and next-day insert of an equal amount: `uv run python manage.py test prices.tests.test_recording`
+- [x] 2.1 Recording tests pass and cover first-of-day insert, same-day unchanged skip, same-day change insert, latest-of-day read, and next-day insert of an equal amount: `uv run python manage.py test prices.tests.test_recording` — 4e93648
 
 ### Phase 3: Four shop readers
 
 #### Automated
 
-- [ ] 3.1 Reader tests pass for saved HTML of Rossmann, DOZ, Super-Pharm, and Gemini, including a page with no price: `uv run python manage.py test prices.tests.test_readers`
+- [x] 3.1 Reader tests pass for saved HTML of Rossmann, DOZ, Super-Pharm, and Gemini, including a page with no price: `uv run python manage.py test prices.tests.test_readers`
 
 #### Manual
 
-- [ ] 3.2 A live page that no longer matches its saved HTML is checked by hand before the fixture is updated
+- [x] 3.2 A live page that no longer matches its saved HTML is checked by hand before the fixture is updated
 
 ### Phase 4: Local record commands
 
