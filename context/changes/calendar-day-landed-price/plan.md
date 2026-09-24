@@ -214,19 +214,19 @@ There is no existing price data. The Phase 1 migration creates the product, shop
 
 #### Automated
 
-- [x] 1.1 Migration applies: `uv run python manage.py migrate`
-- [x] 1.2 Model tests pass: `uv run python manage.py test prices.tests.test_models`
+- [x] 1.1 Migration applies: `uv run python manage.py migrate` — c4ed0bb
+- [x] 1.2 Model tests pass: `uv run python manage.py test prices.tests.test_models` — c4ed0bb
 
 #### Manual
 
-- [x] 1.3 Admin accepts one page per shop and rejects a second page for the same shop
-- [x] 1.4 Admin rejects a URL whose host does not match the chosen shop
+- [x] 1.3 Admin accepts one page per shop and rejects a second page for the same shop — c4ed0bb
+- [x] 1.4 Admin rejects a URL whose host does not match the chosen shop — c4ed0bb
 
 ### Phase 2: Calendar-day write rules
 
 #### Automated
 
-- [ ] 2.1 Recording tests pass and cover first-of-day insert, same-day unchanged skip, same-day change insert, latest-of-day read, and next-day insert of an equal amount: `uv run python manage.py test prices.tests.test_recording`
+- [x] 2.1 Recording tests pass and cover first-of-day insert, same-day unchanged skip, same-day change insert, latest-of-day read, and next-day insert of an equal amount: `uv run python manage.py test prices.tests.test_recording`
 
 ### Phase 3: Four shop readers
 
