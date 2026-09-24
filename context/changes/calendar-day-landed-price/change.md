@@ -1,9 +1,9 @@
 ---
 change_id: calendar-day-landed-price
 title: Record one landed shop price per calendar day
-status: planned
+status: implementing
 created: 2026-09-23
-updated: 2026-09-23
+updated: 2026-09-24
 archived_at: null
 ---
 
