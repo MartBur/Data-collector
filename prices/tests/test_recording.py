@@ -58,6 +58,11 @@ class RecordingTests(TestCase):
         self.assertEqual(price_on_date(self.page, self.tuesday), Decimal("10.00"))
         self.assertEqual(price_on_date(self.page, self.monday), Decimal("10.00"))
 
+    def test_non_positive_amount_is_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            record_price(self.page, Decimal("-1.00"), self.monday)
+        self.assertEqual(self.page.observations.count(), 0)
+
     def test_later_tuesday_read_of_the_same_amount_adds_no_row(self) -> None:
         record_price(self.page, Decimal("10.00"), self.monday)
         record_price(self.page, Decimal("10.00"), self.tuesday)

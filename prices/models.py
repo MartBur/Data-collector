@@ -100,5 +100,13 @@ class PriceObservation(models.Model):
     observed_date: models.DateField = models.DateField()
     recorded_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints: list[models.CheckConstraint] = [
+            models.CheckConstraint(
+                condition=models.Q(amount__gt=0),
+                name="prices_priceobservation_amount_positive",
+            )
+        ]
+
     def __str__(self) -> str:
         return f"{self.shop_page} {self.amount} on {self.observed_date}"

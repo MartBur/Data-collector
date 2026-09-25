@@ -3,5 +3,5 @@ from prices.models import Shop
 
 
 class Command(ShopRecordCommand):
-    help = "Record today's promo price for Rossmann pages only."
-    shop_code = Shop.ROSSMANN
+    help: str = "Record today's promo price for Rossmann pages only."
+    shop_code: str = Shop.ROSSMANN
