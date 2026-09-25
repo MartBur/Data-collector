@@ -1,11 +1,10 @@
 import json
 import re
 from collections.abc import Callable
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from prices.models import Shop
-
-PLN_QUANTUM = Decimal("0.01")
+from prices.recording import normalize_pln
 
 _ROSSMANN_PRICE = re.compile(
     r'data-testid="product-price">\s*'
@@ -26,9 +25,17 @@ _GEMINI_PRICE = re.compile(
 )
 
 
-def _from_parts(whole: str, fraction: str) -> Decimal:
-    """Return a two-decimal PLN amount."""
-    return Decimal(f"{whole}.{fraction}").quantize(PLN_QUANTUM)
+def _positive_pln(value: object) -> Decimal | None:
+    """Return a positive two-decimal PLN amount, or nothing when unusable."""
+    try:
+        return normalize_pln(Decimal(str(value)))
+    except (InvalidOperation, ValueError, ArithmeticError):
+        return None
+
+
+def _from_parts(whole: str, fraction: str) -> Decimal | None:
+    """Return a two-decimal PLN amount, or nothing when it cannot be stored."""
+    return _positive_pln(f"{whole}.{fraction}")
 
 
 def read_rossmann_price(html: str) -> Decimal | None:
@@ -53,13 +60,13 @@ def _offer_price(node: object) -> Decimal | None:
         if node.get("@type") == "Product":
             offers = node.get("offers")
             if isinstance(offers, dict) and "price" in offers:
-                amount = Decimal(str(offers["price"]))
-                return amount.quantize(PLN_QUANTUM)
+                return _positive_pln(offers["price"])
             if isinstance(offers, list):
                 for offer in offers:
                     if isinstance(offer, dict) and "price" in offer:
-                        amount = Decimal(str(offer["price"]))
-                        return amount.quantize(PLN_QUANTUM)
+                        amount = _positive_pln(offer["price"])
+                        if amount is not None:
+                            return amount
         for value in node.values():
             found = _offer_price(value)
             if found is not None:

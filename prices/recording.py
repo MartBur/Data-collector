@@ -1,5 +1,5 @@
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from enum import Enum
 
 from django.db import connection, transaction
@@ -7,6 +7,7 @@ from django.db import connection, transaction
 from prices.models import PriceObservation, ShopPage
 
 PLN_QUANTUM = Decimal("0.01")
+MAX_OBSERVATION_AMOUNT = Decimal("99999999.99")
 
 
 class RecordOutcome(Enum):
@@ -14,9 +15,19 @@ class RecordOutcome(Enum):
     UNCHANGED = "unchanged"
 
 
-def _as_pln(amount: Decimal) -> Decimal:
-    """Return the amount as a two-decimal PLN value."""
-    return amount.quantize(PLN_QUANTUM)
+def normalize_pln(amount: Decimal) -> Decimal:
+    """Return a positive two-decimal amount that fits the observation field."""
+    try:
+        normalized = amount.quantize(PLN_QUANTUM)
+    except (InvalidOperation, ValueError, ArithmeticError) as exc:
+        raise ValueError("Price amount is not a usable PLN value.") from exc
+    if (
+        not normalized.is_finite()
+        or normalized <= 0
+        or normalized > MAX_OBSERVATION_AMOUNT
+    ):
+        raise ValueError("Price amount is not a usable PLN value.")
+    return normalized
 
 
 def latest_observation(
@@ -48,7 +59,7 @@ def record_price(
     observed_date: date,
 ) -> RecordOutcome:
     """Store the first amount for this date, and a later one only when it changes."""
-    normalized = _as_pln(amount)
+    normalized = normalize_pln(amount)
     with transaction.atomic():
         locked_page = shop_page
         if connection.features.has_select_for_update:

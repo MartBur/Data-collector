@@ -106,3 +106,18 @@ class PriceObservationModelTests(TestCase):
             observed_date=observed,
         )
         self.assertEqual(page.observations.filter(observed_date=observed).count(), 2)
+
+    def test_database_rejects_a_non_positive_amount(self) -> None:
+        product = Product.objects.create(name="Shampoo")
+        page = ShopPage.objects.create(
+            product=product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/product/1",
+        )
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                PriceObservation.objects.create(
+                    shop_page=page,
+                    amount=Decimal("-1.00"),
+                    observed_date=date(2026, 9, 24),
+                )
