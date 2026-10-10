@@ -221,14 +221,14 @@ No schema migration. Existing rows are not rewritten. A product that already has
 
 #### Automated
 
-- [ ] 1.1 `uv run python manage.py test` passes
-- [ ] 1.2 `uv run python manage.py makemigrations --check --dry-run` reports no changes
+- [x] 1.1 `uv run python manage.py test` passes
+- [x] 1.2 `uv run python manage.py makemigrations --check --dry-run` reports no changes
 
 #### Manual
 
-- [ ] 1.3 Admin refuses a second product whose name matches an existing one after trimming and case folding
-- [ ] 1.4 Admin refuses a second product's shop page when only www or a trailing slash differs
-- [ ] 1.5 Admin still saves a product with one shop page and a product with four shop pages
+- [x] 1.3 Admin refuses a second product whose name matches an existing one after trimming and case folding
+- [x] 1.4 Admin refuses a second product's shop page when only www or a trailing slash differs
+- [x] 1.5 Admin still saves a product with one shop page and a product with four shop pages
 
 ### Phase 2: Staff add screen
 
