@@ -190,7 +190,7 @@ class AddProductTests(TestCase):
     def test_unknown_added_id_shows_only_the_empty_form(self) -> None:
         Product.objects.create(name="Older shampoo")
         self._login(is_staff=True)
-        for raw_pk in ("999999", "nope"):
+        for raw_pk in ("999999", "nope", "\u00b2"):
             with self.subTest(raw_pk=raw_pk):
                 response = self.client.get(f"{ADD_URL}?added={raw_pk}")
                 self.assertEqual(response.status_code, 200)

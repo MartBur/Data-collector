@@ -20,9 +20,12 @@ class AddProductPage(TypedDict):
 
 def _product_for_added(raw_pk: str | None) -> Product | None:
     """Return the confirmed product, or None for a missing or unknown id."""
-    if raw_pk is None or not raw_pk.isdigit():
+    if raw_pk is None or not raw_pk.isascii() or not raw_pk.isdigit():
         return None
-    pk = int(raw_pk)
+    try:
+        pk = int(raw_pk)
+    except ValueError:
+        return None
     if pk > _MAX_ADDED_PK:
         return None
     return Product.objects.filter(pk=pk).first()
