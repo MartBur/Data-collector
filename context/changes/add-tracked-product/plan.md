@@ -234,11 +234,11 @@ No schema migration. Existing rows are not rewritten. A product that already has
 
 #### Automated
 
-- [x] 2.1 `uv run python manage.py test prices.tests.test_add_product` passes
-- [x] 2.2 `uv run python manage.py test` passes
+- [x] 2.1 `uv run python manage.py test prices.tests.test_add_product` passes — 6efae28
+- [x] 2.2 `uv run python manage.py test` passes — 6efae28
 
 #### Manual
 
-- [x] 2.3 A staff user adds a product with two shop pages, sees that name and those pages, sees an empty form, and a refresh does not create a second product
-- [x] 2.4 A non-staff user sees no add link on home and gets 403 at `/products/add/`
-- [x] 2.5 A staff user who submits a folded duplicate name stays on the filled form and no second product is saved
+- [x] 2.3 A staff user adds a product with two shop pages, sees that name and those pages, sees an empty form, and a refresh does not create a second product — 6efae28
+- [x] 2.4 A non-staff user sees no add link on home and gets 403 at `/products/add/` — 6efae28
+- [x] 2.5 A staff user who submits a folded duplicate name stays on the filled form and no second product is saved — 6efae28
