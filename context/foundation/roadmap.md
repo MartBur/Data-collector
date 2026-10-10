@@ -44,7 +44,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | done |
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | done |
-| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | ready |
+| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | in-progress |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | ready |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | ready |
 
@@ -121,7 +121,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This is the north star. It is as early as sign-in, a tracked product, and a recorded price allow. Today's prices and the chart read Rossmann, DOZ, Super-Pharm, and Gemini.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-04: Favorites with today's lowest price
 
