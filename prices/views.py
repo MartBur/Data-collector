@@ -2,6 +2,7 @@ from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Prefetch
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -16,6 +17,10 @@ class AddProductPage(TypedDict):
     form: AddProductForm
     added: Product | None
     added_pages: list[ShopPage]
+
+
+class ProductListPage(TypedDict):
+    products: list[Product]
 
 
 def _product_for_added(raw_pk: str | None) -> Product | None:
@@ -63,3 +68,31 @@ def add_product(request: HttpRequest) -> HttpResponse:
         "added_pages": _added_pages(added),
     }
     return render(request, "prices/add_product.html", context)
+
+
+def _product_list_key(product: Product) -> tuple[str, int]:
+    """Sort a tracked product by stripped casefolded name, then pk."""
+    return (product.name.strip().casefold(), int(product.pk))
+
+
+def _products_for_list() -> list[Product]:
+    """Return every product, shops in pk order, sorted for the staff list."""
+    products = list(
+        Product.objects.prefetch_related(
+            Prefetch(
+                "shop_pages",
+                queryset=ShopPage.objects.order_by("pk"),
+            )
+        )
+    )
+    products.sort(key=_product_list_key)
+    return products
+
+
+@login_required
+def product_list(request: HttpRequest) -> HttpResponse:
+    """Show every tracked product to staff."""
+    if not request.user.is_staff:
+        raise PermissionDenied
+    context: ProductListPage = {"products": _products_for_list()}
+    return render(request, "prices/product_list.html", context)

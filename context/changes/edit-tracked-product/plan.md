@@ -299,27 +299,27 @@ No schema migration. Existing products stay. A product that already has one shop
 
 #### Automated
 
-- [x] 1.1 `uv run python manage.py test prices.tests.test_add_product` passes
-- [x] 1.2 A staff POST with only the first shop row filled creates one product, one shop page, and zero price observations
-- [x] 1.3 A staff POST with no shop row stores nothing and reports "Enter at least one shop page."
-- [x] 1.4 A staff POST with the third row filled and the second row empty stores nothing
-- [x] 1.5 A staff POST with two filled rows, and a staff POST with three filled rows, still stores those pages
-- [x] 1.6 A half-filled shop row stores nothing
+- [x] 1.1 `uv run python manage.py test prices.tests.test_add_product` passes — c14632f
+- [x] 1.2 A staff POST with only the first shop row filled creates one product, one shop page, and zero price observations — c14632f
+- [x] 1.3 A staff POST with no shop row stores nothing and reports "Enter at least one shop page." — c14632f
+- [x] 1.4 A staff POST with the third row filled and the second row empty stores nothing — c14632f
+- [x] 1.5 A staff POST with two filled rows, and a staff POST with three filled rows, still stores those pages — c14632f
+- [x] 1.6 A half-filled shop row stores nothing — c14632f
 
 #### Manual
 
-- [ ] 1.7 A staff user adds a product with one shop page and sees that name and page on the add confirmation
-- [ ] 1.8 A staff user submits Add with no shop page, sees "Enter at least one shop page.", and the product is absent from the database
+- [x] 1.7 A staff user adds a product with one shop page and sees that name and page on the add confirmation — c14632f
+- [x] 1.8 A staff user submits Add with no shop page, sees "Enter at least one shop page.", and the product is absent from the database — c14632f
 
 ### Phase 2: Staff product list
 
 #### Automated
 
-- [ ] 2.1 `uv run python manage.py test prices.tests.test_product_list` passes
-- [ ] 2.2 Anonymous GET `/products/` redirects to the login page
-- [ ] 2.3 Non-staff GET `/products/` returns 403
-- [ ] 2.4 Staff GET `/products/` lists every product by stripped casefolded name, then pk, each with its shop display names in pk order
-- [ ] 2.5 Staff home links to `/products/` with the text "Tracked products"; non-staff home does not
+- [x] 2.1 `uv run python manage.py test prices.tests.test_product_list` passes
+- [x] 2.2 Anonymous GET `/products/` redirects to the login page
+- [x] 2.3 Non-staff GET `/products/` returns 403
+- [x] 2.4 Staff GET `/products/` lists every product by stripped casefolded name, then pk, each with its shop display names in pk order
+- [x] 2.5 Staff home links to `/products/` with the text "Tracked products"; non-staff home does not
 
 #### Manual
 

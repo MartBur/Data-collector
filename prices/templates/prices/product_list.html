@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tracked products</title>
+</head>
+<body>
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>
+          <p>{{ product.name }}</p>
+          <ul>
+            {% for page in product.shop_pages.all %}
+              <li>{{ page.get_shop_display }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No tracked products.</p>
+  {% endif %}
+</body>
+</html>
