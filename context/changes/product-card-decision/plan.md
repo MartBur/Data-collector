@@ -234,7 +234,7 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 #### Automated
 
-- [x] 1.1 Card figure tests pass for the 30-date window, an empty gap day, tied cheapest shops, a shop with no price today, the all-time low outside the window, and a same-day amount change: `uv run python manage.py test prices.tests.test_card`
+- [x] 1.1 Card figure tests pass for the 30-date window, an empty gap day, tied cheapest shops, a shop with no price today, the all-time low outside the window, and a same-day amount change: `uv run python manage.py test prices.tests.test_card` — f8fc8cf
 
 ### Phase 2: Card page
 
