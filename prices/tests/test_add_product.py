@@ -118,9 +118,42 @@ class AddProductTests(TestCase):
         )
         self.assertEqual(PriceObservation.objects.count(), 0)
 
-    def test_blank_second_row_stores_nothing(self) -> None:
+    def test_staff_post_one_page_redirects_and_confirms(self) -> None:
         self._login(is_staff=True)
-        self._assert_rejected(self._payload(shop_2="", url_2=""))
+        response = self.client.post(
+            ADD_URL,
+            self._payload(shop_2="", url_2=""),
+        )
+        product = Product.objects.get()
+        self.assertRedirects(response, f"{ADD_URL}?added={product.pk}")
+        self.assertEqual(Product.objects.count(), 1)
+        self.assertEqual(ShopPage.objects.count(), 1)
+        self.assertEqual(
+            list(product.shop_pages.order_by("pk").values_list("shop", "url")),
+            [(Shop.ROSSMANN, "https://www.rossmann.pl/Produkt/alpecin")],
+        )
+        self.assertEqual(PriceObservation.objects.count(), 0)
+        follow = self.client.get(f"{ADD_URL}?added={product.pk}")
+        self.assertContains(follow, "Alpecin")
+        self.assertContains(
+            follow,
+            "Rossmann https://www.rossmann.pl/Produkt/alpecin",
+        )
+
+    def test_no_shop_rows_stores_nothing(self) -> None:
+        self._login(is_staff=True)
+        response = self._assert_rejected(
+            self._payload(
+                shop_1="",
+                url_1="",
+                shop_2="",
+                url_2="",
+            )
+        )
+        self.assertIn(
+            "Enter at least one shop page.",
+            response.context["form"].errors["shop_1"],
+        )
 
     def test_half_filled_third_row_stores_nothing(self) -> None:
         self._login(is_staff=True)
@@ -131,6 +164,32 @@ class AddProductTests(TestCase):
         for overrides in cases:
             with self.subTest(overrides=overrides):
                 self._assert_rejected(self._payload(**overrides))
+
+    def test_half_filled_first_or_second_row_stores_nothing(self) -> None:
+        self._login(is_staff=True)
+        cases: tuple[dict[str, str], ...] = (
+            {
+                "shop_1": "",
+                "url_1": "https://www.rossmann.pl/Produkt/alpecin",
+                "shop_2": "",
+                "url_2": "",
+            },
+            {
+                "shop_1": Shop.ROSSMANN,
+                "url_1": "",
+                "shop_2": "",
+                "url_2": "",
+            },
+            {"shop_2": Shop.DOZ, "url_2": ""},
+            {"shop_2": "", "url_2": "https://www.doz.pl/p/alpecin"},
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                self._assert_rejected(self._payload(**overrides))
+
+    def test_second_row_without_first_row_stores_nothing(self) -> None:
+        self._login(is_staff=True)
+        self._assert_rejected(self._payload(shop_1="", url_1=""))
 
     def test_third_row_without_second_row_stores_nothing(self) -> None:
         self._login(is_staff=True)
