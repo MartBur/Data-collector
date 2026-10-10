@@ -42,8 +42,8 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | ID   | Change ID                   | Outcome (user can …)                                                                                          | Prerequisites    | PRD refs                                 | Status   |
 | ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------- | -------- |
 | F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | done |
-| S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | in-progress |
-| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | proposed |
+| S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
+| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | ready |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | proposed |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | proposed |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | proposed |
@@ -97,7 +97,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sign-in stays in this version so favorites are per account. It is first because every later slice assumes a logged-in owner, and it does not wait on the shop decision.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: Add a tracked product
 
@@ -109,7 +109,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** The tracked list is the source of the shop pages the price record and the card read. It sits before the card so the north star has a product to open. Those pages come from Rossmann, DOZ, Super-Pharm, and Gemini, and this slice becomes plannable once sign-in is done.
-- **Status:** proposed
+- **Status:** ready
 
 ### S-03: Product card with history and shop link
 
@@ -154,10 +154,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | Roadmap ID | Change ID                 | Suggested issue title                                              | Ready for `/10x-plan` | Notes                                      | Issue |
 | ---------- | ------------------------- | ------------------------------------------------------------------ | --------------------- | ------------------------------------------ | ----- |
 | F-01       | calendar-day-landed-price | Record one landed shop price per calendar day                     | yes                   | Run `/10x-plan calendar-day-landed-price`  | [#5](https://github.com/MartBur/Data-collector/issues/5) |
-| S-01       | account-sign-in           | Signed-in user can sign in                                        | yes                   | Run `/10x-plan account-sign-in`            | [#6](https://github.com/MartBur/Data-collector/issues/6) |
-| S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | no                    | Waits on S-01. Shop set is named           | [#7](https://github.com/MartBur/Data-collector/issues/7) |
-| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | no          | Waits on S-01, S-02, and F-01. Shop set is named | [#8](https://github.com/MartBur/Data-collector/issues/8) |
-| S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | no                    | Waits on S-01, S-02, and F-01              | [#9](https://github.com/MartBur/Data-collector/issues/9) |
+| S-01       | account-sign-in           | Signed-in user can sign in                                        | yes                   | Implemented 2026-10-10                     | [#6](https://github.com/MartBur/Data-collector/issues/6) |
+| S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | yes                   | S-01 is done. Shop set is named            | [#7](https://github.com/MartBur/Data-collector/issues/7) |
+| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | no          | Waits on S-02. S-01 and F-01 are done. Shop set is named | [#8](https://github.com/MartBur/Data-collector/issues/8) |
+| S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | no                    | Waits on S-02. S-01 and F-01 are done      | [#9](https://github.com/MartBur/Data-collector/issues/9) |
 | S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | no                    | Waits on S-02                              | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 
 ## Open Roadmap Questions
@@ -185,3 +185,4 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 ## Done
 
 - **F-01: (foundation) each tracked product can receive one landed shop price per calendar day without the user acting, and a price labeled today is only that calendar day's record.** — Archived 2026-09-25 → `context/archive/2026-09-23-calendar-day-landed-price/`. Lesson: —.
+- **S-01: user can sign in** — Implemented 2026-10-10 on `main` (`983a0c7`). Change folder: `context/changes/account-sign-in/`. Lesson: —.
