@@ -188,3 +188,4 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 - **S-01: user can sign in** — Implemented 2026-10-10 on `main` (`983a0c7`). Change folder: `context/changes/account-sign-in/`. Lesson: —.
 - **S-01: user can sign in** — Archived 2026-10-10 → `context/archive/2026-10-07-account-sign-in/`. Lesson: —.
 - **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Implemented 2026-10-10 (`6efae28`). Change folder: `context/changes/add-tracked-product/`. Lesson: —.
+- **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Archived 2026-10-10 → `context/archive/2026-10-10-add-tracked-product/`. Lesson: —.
