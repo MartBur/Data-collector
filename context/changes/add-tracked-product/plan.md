@@ -221,24 +221,24 @@ No schema migration. Existing rows are not rewritten. A product that already has
 
 #### Automated
 
-- [x] 1.1 `uv run python manage.py test` passes
-- [x] 1.2 `uv run python manage.py makemigrations --check --dry-run` reports no changes
+- [x] 1.1 `uv run python manage.py test` passes — 775815c
+- [x] 1.2 `uv run python manage.py makemigrations --check --dry-run` reports no changes — 775815c
 
 #### Manual
 
-- [x] 1.3 Admin refuses a second product whose name matches an existing one after trimming and case folding
-- [x] 1.4 Admin refuses a second product's shop page when only www or a trailing slash differs
-- [x] 1.5 Admin still saves a product with one shop page and a product with four shop pages
+- [x] 1.3 Admin refuses a second product whose name matches an existing one after trimming and case folding — 775815c
+- [x] 1.4 Admin refuses a second product's shop page when only www or a trailing slash differs — 775815c
+- [x] 1.5 Admin still saves a product with one shop page and a product with four shop pages — 775815c
 
 ### Phase 2: Staff add screen
 
 #### Automated
 
-- [ ] 2.1 `uv run python manage.py test prices.tests.test_add_product` passes
-- [ ] 2.2 `uv run python manage.py test` passes
+- [x] 2.1 `uv run python manage.py test prices.tests.test_add_product` passes
+- [x] 2.2 `uv run python manage.py test` passes
 
 #### Manual
 
-- [ ] 2.3 A staff user adds a product with two shop pages, sees that name and those pages, sees an empty form, and a refresh does not create a second product
-- [ ] 2.4 A non-staff user sees no add link on home and gets 403 at `/products/add/`
-- [ ] 2.5 A staff user who submits a folded duplicate name stays on the filled form and no second product is saved
+- [x] 2.3 A staff user adds a product with two shop pages, sees that name and those pages, sees an empty form, and a refresh does not create a second product
+- [x] 2.4 A non-staff user sees no add link on home and gets 403 at `/products/add/`
+- [x] 2.5 A staff user who submits a folded duplicate name stays on the filled form and no second product is saved

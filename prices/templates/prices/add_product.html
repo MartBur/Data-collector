@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Add product</title>
+</head>
+<body>
+  {% if added %}
+    <p>{{ added.name }}</p>
+    <ul>
+      {% for page in added_pages %}
+        <li>{{ page.get_shop_display }} {{ page.url }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <form method="post" action="{% url 'prices:add_product' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add product</button>
+  </form>
+</body>
+</html>
