@@ -3,7 +3,7 @@ project: Data Collector
 version: 1
 status: draft
 created: 2026-09-22
-updated: 2026-09-25
+updated: 2026-10-10
 prd_version: 5
 main_goal: speed
 top_blocker: decisions
@@ -42,7 +42,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | ID   | Change ID                   | Outcome (user can …)                                                                                          | Prerequisites    | PRD refs                                 | Status   |
 | ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------- | -------- |
 | F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | done |
-| S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | ready    |
+| S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | in-progress |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | proposed |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | proposed |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | proposed |
@@ -97,7 +97,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sign-in stays in this version so favorites are per account. It is first because every later slice assumes a logged-in owner, and it does not wait on the shop decision.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-02: Add a tracked product
 
