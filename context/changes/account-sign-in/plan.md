@@ -237,10 +237,10 @@ No schema or data migration. `django.contrib.auth` tables already exist after `m
 
 #### Automated
 
-- [x] 2.1 Sign-out tests pass: `uv run python manage.py test accounts.tests.test_sign_out`
-- [x] 2.2 Accounts suite passes: `uv run python manage.py test accounts`
+- [x] 2.1 Sign-out tests pass: `uv run python manage.py test accounts.tests.test_sign_out` — 65661f7
+- [x] 2.2 Accounts suite passes: `uv run python manage.py test accounts` — 65661f7
 
 #### Manual
 
-- [x] 2.3 Sign out from the signed-in page returns to the sign-in form
-- [x] 2.4 Opening the sign-in form while signed in returns to the signed-in page
+- [x] 2.3 Sign out from the signed-in page returns to the sign-in form — 65661f7
+- [x] 2.4 Opening the sign-in form while signed in returns to the signed-in page — 65661f7
