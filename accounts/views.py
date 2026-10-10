@@ -6,7 +6,7 @@ from django.shortcuts import render
 
 class SignInView(LoginView):
     template_name: str = "registration/login.html"
-    redirect_authenticated_user: bool = False
+    redirect_authenticated_user: bool = True
 
 
 @login_required

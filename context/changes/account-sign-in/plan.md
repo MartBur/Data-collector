@@ -223,24 +223,24 @@ No schema or data migration. `django.contrib.auth` tables already exist after `m
 
 #### Automated
 
-- [x] 1.1 Sign-in tests pass: `uv run python manage.py test accounts.tests.test_sign_in`
-- [x] 1.2 App adds no tables: `uv run python manage.py makemigrations --check --dry-run`
-- [x] 1.3 Project check passes: `uv run python manage.py check`
+- [x] 1.1 Sign-in tests pass: `uv run python manage.py test accounts.tests.test_sign_in` — 6417782
+- [x] 1.2 App adds no tables: `uv run python manage.py makemigrations --check --dry-run` — 6417782
+- [x] 1.3 Project check passes: `uv run python manage.py check` — 6417782
 
 #### Manual
 
-- [x] 1.4 Browser sign-in with an existing username and password shows that username
-- [x] 1.5 A wrong password stays on the form and shows the invalid-login error
-- [x] 1.6 `/admin/login/` still shows the admin sign-in page
+- [x] 1.4 Browser sign-in with an existing username and password shows that username — 6417782
+- [x] 1.5 A wrong password stays on the form and shows the invalid-login error — 6417782
+- [x] 1.6 `/admin/login/` still shows the admin sign-in page — 6417782
 
 ### Phase 2: Sign out
 
 #### Automated
 
-- [ ] 2.1 Sign-out tests pass: `uv run python manage.py test accounts.tests.test_sign_out`
-- [ ] 2.2 Accounts suite passes: `uv run python manage.py test accounts`
+- [x] 2.1 Sign-out tests pass: `uv run python manage.py test accounts.tests.test_sign_out`
+- [x] 2.2 Accounts suite passes: `uv run python manage.py test accounts`
 
 #### Manual
 
-- [ ] 2.3 Sign out from the signed-in page returns to the sign-in form
-- [ ] 2.4 Opening the sign-in form while signed in returns to the signed-in page
+- [x] 2.3 Sign out from the signed-in page returns to the sign-in form
+- [x] 2.4 Opening the sign-in form while signed in returns to the signed-in page
