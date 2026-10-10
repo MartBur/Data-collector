@@ -25,6 +25,13 @@ class SignOutTests(TestCase):
         response = self.client.get("/accounts/login/")
         self.assertRedirects(response, "/")
 
+    def test_signed_in_login_next_pointing_at_login_returns_home(self) -> None:
+        response = self.client.get(
+            "/accounts/login/",
+            {"next": "/accounts/login/"},
+        )
+        self.assertRedirects(response, "/")
+
     def test_signed_in_page_has_post_logout_form(self) -> None:
         response = self.client.get("/")
         self.assertContains(response, 'method="post"')
