@@ -8,10 +8,20 @@ from prices.models import Product, Shop, ShopPage, shop_url_host_is_valid
 
 RowKind = Literal["empty", "half", "filled"]
 
+_AT_LEAST_ONE_PAGE: str = "Enter at least one shop page."
 _THIRD_ROW_PARTIAL: str = (
     "Enter both a shop and a URL for the third page, or leave both empty."
 )
 _THIRD_ROW_WITHOUT_SECOND: str = "Enter the second shop page before the third."
+_ROW_PARTIAL: tuple[str, str, str] = (
+    "Enter both a shop and a URL for the first page, or leave both empty.",
+    "Enter both a shop and a URL for the second page, or leave both empty.",
+    _THIRD_ROW_PARTIAL,
+)
+_PRIOR_ROW_REQUIRED: tuple[str, str] = (
+    "Enter the first shop page before the second.",
+    _THIRD_ROW_WITHOUT_SECOND,
+)
 _DISTINCT_SHOPS: str = "Each shop page must use a different shop."
 _WRONG_HOST: str = "Enter a URL on the chosen shop's website."
 _PAGE_ROWS: tuple[tuple[str, str], ...] = (
@@ -25,7 +35,7 @@ def shop_field_choices() -> list[tuple[str, str]]:
     """Return a blank option followed by ``Shop.choices``.
 
     The blank option is not a shop. It lets the browser submit an empty
-    third row. Only ``Shop.choices`` values pass validation.
+    row. Only ``Shop.choices`` values pass validation.
     """
     choices: list[tuple[str, str]] = [("", "---------")]
     for value, label in Shop.choices:
@@ -34,7 +44,7 @@ def shop_field_choices() -> list[tuple[str, str]]:
 
 
 class AddProductForm(forms.Form):
-    """Collect a product name and two or three shop pages."""
+    """Collect a product name and one, two, or three shop pages."""
 
     name: forms.CharField = forms.CharField(
         label="Name",
@@ -45,22 +55,22 @@ class AddProductForm(forms.Form):
     shop_1: forms.ChoiceField = forms.ChoiceField(
         label="Shop 1",
         choices=shop_field_choices(),
-        required=True,
+        required=False,
     )
     url_1: forms.URLField = forms.URLField(
         label="URL 1",
         max_length=2048,
-        required=True,
+        required=False,
     )
     shop_2: forms.ChoiceField = forms.ChoiceField(
         label="Shop 2",
         choices=shop_field_choices(),
-        required=True,
+        required=False,
     )
     url_2: forms.URLField = forms.URLField(
         label="URL 2",
         max_length=2048,
-        required=True,
+        required=False,
     )
     shop_3: forms.ChoiceField = forms.ChoiceField(
         label="Shop 3",
@@ -74,7 +84,7 @@ class AddProductForm(forms.Form):
     )
 
     def clean(self) -> dict[str, str]:
-        """Reject an incomplete set, a repeated shop, or a URL on the wrong host."""
+        """Reject an empty, half-filled, or gapped set, a repeated shop, or a bad host."""
         self._reject_row_shape()
         self._reject_duplicate_shops_and_bad_hosts()
         return self._string_cleaned_data()
@@ -142,16 +152,29 @@ class AddProductForm(forms.Form):
         return rows
 
     def _reject_row_shape(self) -> None:
-        """Reject a half-filled third row, or a third row without the second."""
-        third = self._row_kind("shop_3", "url_3")
-        second = self._row_kind("shop_2", "url_2")
-        if third == "half":
-            if self._posted("shop_3") == "":
-                self.add_error("shop_3", _THIRD_ROW_PARTIAL)
-            else:
-                self.add_error("url_3", _THIRD_ROW_PARTIAL)
-        if third == "filled" and second != "filled":
-            self.add_error("url_3", _THIRD_ROW_WITHOUT_SECOND)
+        """Reject zero pages, a half-filled row, or a filled row after an empty one."""
+        kinds: list[RowKind] = [
+            self._row_kind(shop_field, url_field)
+            for shop_field, url_field in _PAGE_ROWS
+        ]
+        filled_count: int = 0
+        for index, (shop_field, url_field) in enumerate(_PAGE_ROWS):
+            kind: RowKind = kinds[index]
+            if kind == "filled":
+                filled_count += 1
+                if index > 0 and kinds[index - 1] != "filled":
+                    self.add_error(url_field, _PRIOR_ROW_REQUIRED[index - 1])
+            elif kind == "half":
+                self._reject_half_row(shop_field, url_field, _ROW_PARTIAL[index])
+        if filled_count == 0:
+            self.add_error("shop_1", _AT_LEAST_ONE_PAGE)
+
+    def _reject_half_row(self, shop_field: str, url_field: str, message: str) -> None:
+        """Attach a half-filled-row message to the empty shop or URL."""
+        if self._posted(shop_field) == "":
+            self.add_error(shop_field, message)
+        else:
+            self.add_error(url_field, message)
 
     def _reject_duplicate_shops_and_bad_hosts(self) -> None:
         """Reject repeated shops and URLs whose host is not that shop."""

@@ -299,12 +299,12 @@ No schema migration. Existing products stay. A product that already has one shop
 
 #### Automated
 
-- [ ] 1.1 `uv run python manage.py test prices.tests.test_add_product` passes
-- [ ] 1.2 A staff POST with only the first shop row filled creates one product, one shop page, and zero price observations
-- [ ] 1.3 A staff POST with no shop row stores nothing and reports "Enter at least one shop page."
-- [ ] 1.4 A staff POST with the third row filled and the second row empty stores nothing
-- [ ] 1.5 A staff POST with two filled rows, and a staff POST with three filled rows, still stores those pages
-- [ ] 1.6 A half-filled shop row stores nothing
+- [x] 1.1 `uv run python manage.py test prices.tests.test_add_product` passes
+- [x] 1.2 A staff POST with only the first shop row filled creates one product, one shop page, and zero price observations
+- [x] 1.3 A staff POST with no shop row stores nothing and reports "Enter at least one shop page."
+- [x] 1.4 A staff POST with the third row filled and the second row empty stores nothing
+- [x] 1.5 A staff POST with two filled rows, and a staff POST with three filled rows, still stores those pages
+- [x] 1.6 A half-filled shop row stores nothing
 
 #### Manual
 
