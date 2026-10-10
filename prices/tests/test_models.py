@@ -85,6 +85,109 @@ class ShopPageModelTests(TestCase):
         apex_page.full_clean()
         apex_page.save()
 
+    def test_same_shop_page_ignoring_www_and_trailing_slash_is_rejected(self) -> None:
+        ShopPage.objects.create(
+            product=self.product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon",
+        )
+        other = Product.objects.create(name="Soap")
+        duplicate = ShopPage(
+            product=other,
+            shop=Shop.ROSSMANN,
+            url="https://rossmann.pl/Produkt/szampon/",
+        )
+        with self.assertRaises(ValidationError) as raised:
+            duplicate.full_clean()
+        self.assertIn("url", raised.exception.error_dict)
+
+    def test_query_string_distinguishes_shop_pages(self) -> None:
+        ShopPage.objects.create(
+            product=self.product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon?a=1",
+        )
+        other = Product.objects.create(name="Soap")
+        page = ShopPage(
+            product=other,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon?a=2",
+        )
+        page.full_clean()
+        page.save()
+
+    def test_scheme_distinguishes_shop_pages(self) -> None:
+        ShopPage.objects.create(
+            product=self.product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon",
+        )
+        other = Product.objects.create(name="Soap")
+        page = ShopPage(
+            product=other,
+            shop=Shop.ROSSMANN,
+            url="http://www.rossmann.pl/Produkt/szampon",
+        )
+        page.full_clean()
+        page.save()
+
+    def test_fragment_does_not_distinguish_shop_pages(self) -> None:
+        ShopPage.objects.create(
+            product=self.product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon",
+        )
+        other = Product.objects.create(name="Soap")
+        duplicate = ShopPage(
+            product=other,
+            shop=Shop.ROSSMANN,
+            url="https://rossmann.pl/Produkt/szampon/#opis",
+        )
+        with self.assertRaises(ValidationError) as raised:
+            duplicate.full_clean()
+        self.assertIn("url", raised.exception.error_dict)
+
+    def test_existing_shop_page_does_not_clash_with_itself(self) -> None:
+        page = ShopPage.objects.create(
+            product=self.product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/Produkt/szampon/",
+        )
+        page.full_clean()
+
+
+class ProductNameTests(TestCase):
+    def test_folded_duplicate_name_is_rejected(self) -> None:
+        Product.objects.create(name="Alpecin")
+        duplicate = Product(name=" alpecin ")
+        with self.assertRaises(ValidationError) as raised:
+            duplicate.full_clean()
+        self.assertIn("name", raised.exception.error_dict)
+        self.assertEqual(duplicate.name, "alpecin")
+
+    def test_internal_space_difference_is_a_different_name(self) -> None:
+        Product.objects.create(name="Alpecin shampoo")
+        other = Product(name="Alpecin  shampoo")
+        other.full_clean()
+        other.save()
+        self.assertEqual(Product.objects.count(), 2)
+
+    def test_blank_name_is_rejected(self) -> None:
+        blank = Product(name="   ")
+        with self.assertRaises(ValidationError) as raised:
+            blank.full_clean()
+        self.assertIn("name", raised.exception.error_dict)
+
+    def test_clean_stores_the_trimmed_spelling(self) -> None:
+        product = Product(name="  Alpecin  ")
+        product.full_clean()
+        product.save()
+        self.assertEqual(product.name, "Alpecin")
+
+    def test_existing_product_name_does_not_clash_with_itself(self) -> None:
+        product = Product.objects.create(name="Alpecin")
+        product.full_clean()
+
 
 class PriceObservationModelTests(TestCase):
     def test_many_observations_may_exist_for_one_page_on_one_date(self) -> None:

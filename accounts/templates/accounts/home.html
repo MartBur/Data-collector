@@ -6,6 +6,9 @@
 </head>
 <body>
   <p>{{ user.get_username }}</p>
+  {% if user.is_staff %}
+    <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>
+  {% endif %}
   <form method="post" action="{% url 'accounts:logout' %}">
     {% csrf_token %}
     <button type="submit">Sign out</button>

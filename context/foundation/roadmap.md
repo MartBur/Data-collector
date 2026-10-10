@@ -43,7 +43,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------- | -------- |
 | F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | done |
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
-| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | planning |
+| S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | in-progress |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | proposed |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | proposed |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | proposed |
@@ -109,7 +109,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** The tracked list is the source of the shop pages the price record and the card read. It sits before the card so the north star has a product to open. Those pages come from Rossmann, DOZ, Super-Pharm, and Gemini, and this slice becomes plannable once sign-in is done.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-03: Product card with history and shop link
 

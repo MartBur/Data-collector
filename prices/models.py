@@ -38,11 +38,38 @@ def shop_url_host_is_valid(shop: str, url: str) -> bool:
     return canonical_host(url) == expected
 
 
+def shop_page_key(shop: str, url: str) -> tuple[str, str, str, str, str] | None:
+    """Return a shop page's identity, ignoring www, one trailing slash, and the fragment."""
+    parsed = urlparse(url)
+    host = canonical_host(url)
+    if host is None or parsed.scheme == "":
+        return None
+    path = "/" if parsed.path == "" else parsed.path
+    if path.endswith("/") and path != "/":
+        path = path[:-1]
+    return (shop, parsed.scheme.casefold(), host, path, parsed.query)
+
+
 class Product(models.Model):
     name: models.CharField = models.CharField(max_length=255)
 
     def __str__(self) -> str:
         return self.name
+
+    def clean(self) -> None:
+        super().clean()
+        self.name = self.name.strip()
+        if self.name == "":
+            raise ValidationError({"name": "Name cannot be blank."})
+        folded = self.name.casefold()
+        others = Product.objects.all()
+        if self.pk is not None:
+            others = others.exclude(pk=self.pk)
+        for other in others:
+            if other.name.strip().casefold() == folded:
+                raise ValidationError(
+                    {"name": "A product with this name already exists."}
+                )
 
 
 class ShopPage(models.Model):
@@ -88,6 +115,21 @@ class ShopPage(models.Model):
                 raise ValidationError(
                     {"shop": "This product already has a page for that shop."}
                 )
+        if self.shop and self.url:
+            key = shop_page_key(self.shop, self.url)
+            if key is not None:
+                others = ShopPage.objects.filter(shop=self.shop)
+                if self.pk is not None:
+                    others = others.exclude(pk=self.pk)
+                for other in others:
+                    if shop_page_key(other.shop, other.url) == key:
+                        raise ValidationError(
+                            {
+                                "url": (
+                                    "Another product already has this shop page."
+                                )
+                            }
+                        )
 
 
 class PriceObservation(models.Model):
