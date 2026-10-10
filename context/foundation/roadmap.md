@@ -186,3 +186,4 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 
 - **F-01: (foundation) each tracked product can receive one landed shop price per calendar day without the user acting, and a price labeled today is only that calendar day's record.** — Archived 2026-09-25 → `context/archive/2026-09-23-calendar-day-landed-price/`. Lesson: —.
 - **S-01: user can sign in** — Implemented 2026-10-10 on `main` (`983a0c7`). Change folder: `context/changes/account-sign-in/`. Lesson: —.
+- **S-01: user can sign in** — Archived 2026-10-10 → `context/archive/2026-10-07-account-sign-in/`. Lesson: —.
