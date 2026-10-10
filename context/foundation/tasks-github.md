@@ -49,13 +49,13 @@ Examples: `S-01: Signed-in user can sign in`, `Decision: Which shops are in the 
 | ---------- | ------------------------- | -------- | ----- |
 | F-01       | calendar-day-landed-price | done     | [#5](https://github.com/MartBur/Data-collector/issues/5) |
 | S-01       | account-sign-in           | done     | [#6](https://github.com/MartBur/Data-collector/issues/6) |
-| S-02       | add-tracked-product       | ready    | [#7](https://github.com/MartBur/Data-collector/issues/7) |
-| S-03       | product-card-decision     | proposed | [#8](https://github.com/MartBur/Data-collector/issues/8) |
-| S-04       | favorites-lowest-today    | proposed | [#9](https://github.com/MartBur/Data-collector/issues/9) |
-| S-05       | edit-tracked-product      | proposed | [#10](https://github.com/MartBur/Data-collector/issues/10) |
+| S-02       | add-tracked-product       | done     | [#7](https://github.com/MartBur/Data-collector/issues/7) |
+| S-03       | product-card-decision     | ready    | [#8](https://github.com/MartBur/Data-collector/issues/8) |
+| S-04       | favorites-lowest-today    | ready    | [#9](https://github.com/MartBur/Data-collector/issues/9) |
+| S-05       | edit-tracked-product      | ready    | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 | —          | shop-set decision         | settled  | [#11](https://github.com/MartBur/Data-collector/issues/11) |
 
-[#5](https://github.com/MartBur/Data-collector/issues/5) is closed. [#6](https://github.com/MartBur/Data-collector/issues/6) is closed: sign-in is implemented. [#7](https://github.com/MartBur/Data-collector/issues/7) is ready for `/10x-plan`. [#8](https://github.com/MartBur/Data-collector/issues/8) and [#9](https://github.com/MartBur/Data-collector/issues/9) still wait on S-02. [#11](https://github.com/MartBur/Data-collector/issues/11) is closed and settled: Rossmann, DOZ, Super-Pharm, and Gemini. The timezone question is non-blocking and lives in the F-01 and S-04 bodies.
+[#5](https://github.com/MartBur/Data-collector/issues/5) is closed. [#6](https://github.com/MartBur/Data-collector/issues/6) is closed: sign-in is implemented. [#7](https://github.com/MartBur/Data-collector/issues/7) is closed: a staff user can add a tracked product with two or three shop pages. [#8](https://github.com/MartBur/Data-collector/issues/8), [#9](https://github.com/MartBur/Data-collector/issues/9), and [#10](https://github.com/MartBur/Data-collector/issues/10) are ready for `/10x-plan`. [#11](https://github.com/MartBur/Data-collector/issues/11) is closed and settled: Rossmann, DOZ, Super-Pharm, and Gemini. The timezone question is non-blocking and lives in the F-01 and S-04 bodies.
 
 Blocked-by edges:
 
