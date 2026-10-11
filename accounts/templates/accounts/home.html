@@ -10,6 +10,13 @@
     <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>
     <p><a href="{% url 'prices:product_list' %}">Tracked products</a></p>
   {% endif %}
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li><a href="{% url 'prices:product_card' product.pk %}">{{ product.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
   <form method="post" action="{% url 'accounts:logout' %}">
     {% csrf_token %}
     <button type="submit">Sign out</button>

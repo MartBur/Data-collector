@@ -240,22 +240,22 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 #### Automated
 
-- [x] 2.1 Product card tests pass for the sign-in redirect, a non-staff user, an unknown product, today's price, a shop with no price, every tied cheapest shop, the lowest recorded price, the shop link, and a line across a gap: `uv run python manage.py test prices.tests.test_product_card`
-- [x] 2.2 Prices tests still pass: `uv run python manage.py test prices`
+- [x] 2.1 Product card tests pass for the sign-in redirect, a non-staff user, an unknown product, today's price, a shop with no price, every tied cheapest shop, the lowest recorded price, the shop link, and a line across a gap: `uv run python manage.py test prices.tests.test_product_card` — 510c7bc
+- [x] 2.2 Prices tests still pass: `uv run python manage.py test prices` — 510c7bc
 
 #### Manual
 
-- [ ] 2.3 On a product with a missing day between two prices, the line crosses that day, the day stays on the axis, a shop with no price today shows no amount and still links to its page, and the lowest recorded price can be older than the chart
-- [ ] 2.4 The card shows the product name, shop prices, the chart, and shop links, and it shows no description and no availability
+- [x] 2.3 On a product with a missing day between two prices, the line crosses that day, the day stays on the axis, a shop with no price today shows no amount and still links to its page, and the lowest recorded price can be older than the chart — 510c7bc
+- [x] 2.4 The card shows the product name, shop prices, the chart, and shop links, and it shows no description and no availability — 510c7bc
 
 ### Phase 3: Home links
 
 #### Automated
 
-- [ ] 3.1 Home tests pass for name-only links in case-insensitive name order, a non-staff user opening a card from that list, and no prices on the home page: `uv run python manage.py test accounts.tests.test_home`
-- [ ] 3.2 The project test suite passes: `uv run python manage.py test`
+- [x] 3.1 Home tests pass for name-only links in case-insensitive name order, a non-staff user opening a card from that list, and no prices on the home page: `uv run python manage.py test accounts.tests.test_home`
+- [x] 3.2 The project test suite passes: `uv run python manage.py test`
 
 #### Manual
 
-- [ ] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card
-- [ ] 3.4 As a staff user, the add-product link is still on the home page
+- [x] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card
+- [x] 3.4 As a staff user, the add-product link is still on the home page
