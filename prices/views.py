@@ -288,7 +288,14 @@ _PLOT_RIGHT: Decimal = Decimal("500")
 _PLOT_TOP: Decimal = Decimal("28")
 _PLOT_BOTTOM: Decimal = Decimal("160")
 _Y_ORIGIN_GAP: Decimal = Decimal("50")
-_Y_TICK_STEP: Decimal = Decimal("10")
+_MAX_Y_TICK_INTERVALS: int = 20
+_MIN_Y_TICK_STEP: Decimal = Decimal("1")
+_NICE_TICK_MULTIPLIERS: tuple[Decimal, ...] = (
+    Decimal("1"),
+    Decimal("2"),
+    Decimal("5"),
+    Decimal("10"),
+)
 _LEGEND_MARK_X1: Decimal = Decimal("516")
 _LEGEND_MARK_X2: Decimal = Decimal("544")
 _LEGEND_TEXT_X: Decimal = Decimal("552")
@@ -391,21 +398,38 @@ def _axis_floor(lowest: Decimal) -> Decimal:
     return lowered
 
 
-def _axis_ceiling(floor: Decimal, highest: Decimal) -> Decimal:
-    """Return the top tick, a 10 PLN step at or above the highest price."""
+def _tick_step(floor: Decimal, highest: Decimal) -> Decimal:
+    """Return a nice tick step that keeps the chart to at most 20 intervals."""
+    target = (highest - floor) / Decimal(_MAX_Y_TICK_INTERVALS)
+    if target <= _MIN_Y_TICK_STEP:
+        return _MIN_Y_TICK_STEP
+    magnitude = Decimal("1").scaleb(target.adjusted())
+    for multiplier in _NICE_TICK_MULTIPLIERS:
+        candidate = magnitude * multiplier
+        if candidate >= target:
+            return candidate
+    return magnitude * Decimal("10")
+
+
+def _axis_ceiling(floor: Decimal, highest: Decimal, step: Decimal) -> Decimal:
+    """Return the first tick at or above the highest price."""
     if highest <= floor:
-        return floor + _Y_TICK_STEP
-    steps = ((highest - floor) / _Y_TICK_STEP).to_integral_value(ROUND_CEILING)
-    return floor + steps * _Y_TICK_STEP
+        return floor + step
+    steps = ((highest - floor) / step).to_integral_value(ROUND_CEILING)
+    return floor + steps * step
 
 
-def _price_ticks(floor: Decimal, ceiling: Decimal) -> list[Decimal]:
-    """Return Y-axis labels from the floor up to the ceiling, every 10 PLN."""
+def _price_ticks(
+    floor: Decimal,
+    ceiling: Decimal,
+    step: Decimal,
+) -> list[Decimal]:
+    """Return Y-axis labels from the floor to the ceiling at the chosen step."""
     ticks: list[Decimal] = []
     value = floor
     while value <= ceiling:
         ticks.append(value)
-        value += _Y_TICK_STEP
+        value += step
     return ticks
 
 
@@ -424,14 +448,15 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
     if bounds is not None:
         lowest, highest = bounds
         floor = _axis_floor(lowest)
-        ceiling = _axis_ceiling(floor, highest)
+        step = _tick_step(floor, highest)
+        ceiling = _axis_ceiling(floor, highest, step)
         scale = (floor, ceiling)
         y_ticks = [
             {
                 "y": _two_decimals(_y_for_amount(price, floor, ceiling)),
                 "label": _two_decimals(price),
             }
-            for price in _price_ticks(floor, ceiling)
+            for price in _price_ticks(floor, ceiling, step)
         ]
     ticks = [_two_decimals(_slot_x(index, count)) for index in range(count)]
     plotted: list[ChartSeries] = []
