@@ -348,16 +348,16 @@ No schema migration. Existing products stay. A product that already has one shop
 
 #### Automated
 
-- [x] 4.1 `uv run python manage.py test prices.tests.test_remove_product` passes
-- [x] 4.2 Removing one page from a three-page product deletes that page and its prices, leaves the other pages, and redirects to `/products/`
-- [x] 4.3 Removing a page that has no prices skips confirm and deletes the page
-- [x] 4.4 Removing a page that has prices writes nothing until confirm is posted, and the confirm page includes the product name, the shop name, and "recorded prices will be deleted"
-- [x] 4.5 Removing the only page leaves the product and its prices unchanged, redirects to `/products/?kept=<pk>`, and the list shows "A tracked product must keep one shop page."
-- [x] 4.6 Removing the whole product deletes the product, its pages, and their prices, after confirm when any of those pages has a price
-- [x] 4.7 Non-staff POST returns 403, and a shop page that belongs to another product returns 404 and deletes nothing
+- [x] 4.1 `uv run python manage.py test prices.tests.test_remove_product` passes — dfedb43
+- [x] 4.2 Removing one page from a three-page product deletes that page and its prices, leaves the other pages, and redirects to `/products/` — dfedb43
+- [x] 4.3 Removing a page that has no prices skips confirm and deletes the page — dfedb43
+- [x] 4.4 Removing a page that has prices writes nothing until confirm is posted, and the confirm page includes the product name, the shop name, and "recorded prices will be deleted" — dfedb43
+- [x] 4.5 Removing the only page leaves the product and its prices unchanged, redirects to `/products/?kept=<pk>`, and the list shows "A tracked product must keep one shop page." — dfedb43
+- [x] 4.6 Removing the whole product deletes the product, its pages, and their prices, after confirm when any of those pages has a price — dfedb43
+- [x] 4.7 Non-staff POST returns 403, and a shop page that belongs to another product returns 404 and deletes nothing — dfedb43
 
 #### Manual
 
-- [x] 4.8 A staff user removes one shop from a three-shop product and sees the other shops still on the list
-- [x] 4.9 A staff user tries to remove the only shop and still sees that product with its page and the sentence "A tracked product must keep one shop page."
-- [x] 4.10 A staff user removes a whole product and no longer sees it on the list
+- [x] 4.8 A staff user removes one shop from a three-shop product and sees the other shops still on the list — dfedb43
+- [x] 4.9 A staff user tries to remove the only shop and still sees that product with its page and the sentence "A tracked product must keep one shop page." — dfedb43
+- [x] 4.10 A staff user removes a whole product and no longer sees it on the list — dfedb43
