@@ -326,17 +326,17 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 - [x] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card — 9c95344
 - [x] 3.4 As a staff user, the add-product link is still on the home page — 9c95344
-- [x] 3.5 The Home link is present on the sign-in page, home, the product list, add, a card, change, and the remove confirmation: `uv run python manage.py test accounts.tests.test_home.HomeTests.test_home_button_is_on_every_page`
-- [x] 3.6 From the sign-in page, a product card, and /products/, click Home and land on the main page
+- [x] 3.5 The Home link is present on the sign-in page, home, the product list, add, a card, change, and the remove confirmation: `uv run python manage.py test accounts.tests.test_home.HomeTests.test_home_button_is_on_every_page` — 145d67d
+- [x] 3.6 From the sign-in page, a product card, and /products/, click Home and land on the main page — 145d67d
 
 ### Phase 4: Chart axis, legend, and link targets
 
 #### Automated
 
-- [x] 4.1 Card and product-list tests pass for a Y axis that starts 50 below the lowest chart price and not below zero, a legend naming each drawn shop, a shop link that opens in a new tab, and a product name on /products/ that opens the card in the same tab: `uv run python manage.py test prices.tests.test_product_card prices.tests.test_product_list`
+- [x] 4.1 Card and product-list tests pass for a Y axis that starts 50 below the lowest chart price and not below zero, a legend naming each drawn shop, a shop link that opens in a new tab, and a product name on /products/ that opens the card in the same tab: `uv run python manage.py test prices.tests.test_product_card prices.tests.test_product_list` — 145d67d
 
 #### Manual
 
-- [x] 4.2 On a product whose lowest chart price is above 50 PLN, the Y axis starts at that price minus 50, labels continue every 10 PLN, and each drawn line has its shop name and color under the chart
-- [x] 4.3 On a product whose lowest chart price is below 50 PLN, the Y axis starts at 0.00
-- [x] 4.4 A shop name on the card opens that shop page in a new tab, and a product name on /products/ opens the card in the same tab
+- [x] 4.2 On a product whose lowest chart price is above 50 PLN, the Y axis starts at that price minus 50, labels continue every 10 PLN, and each drawn line has its shop name and color under the chart — 145d67d
+- [x] 4.3 On a product whose lowest chart price is below 50 PLN, the Y axis starts at 0.00 — 145d67d
+- [x] 4.4 A shop name on the card opens that shop page in a new tab, and a product name on /products/ opens the card in the same tab — 145d67d
