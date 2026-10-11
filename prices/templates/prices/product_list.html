@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tracked products</title>
+</head>
+<body>
+  {% if kept_notice %}
+    <p>A tracked product must keep one shop page.</p>
+  {% endif %}
+  {% if canceled_notice %}
+    <p>Action was canceled.</p>
+  {% endif %}
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>
+          <p>{{ product.name }}</p>
+          <p><a href="{% url 'prices:change_product' product.pk %}">Change</a></p>
+          <form method="post" action="{% url 'prices:remove_product' product.pk %}">
+            {% csrf_token %}
+            <button type="submit">Remove product</button>
+          </form>
+          <ul>
+            {% for page in product.shop_pages.all %}
+              <li>
+                {{ page.get_shop_display }}
+                <form method="post" action="{% url 'prices:remove_shop_page' product.pk page.pk %}">
+                  {% csrf_token %}
+                  <button type="submit">Remove</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No tracked products.</p>
+  {% endif %}
+</body>
+</html>

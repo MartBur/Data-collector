@@ -3,6 +3,7 @@ from typing import Literal, NoReturn
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import QueryDict
 
 from prices.models import Product, Shop, ShopPage, shop_url_host_is_valid
 
@@ -216,3 +217,90 @@ class AddProductForm(forms.Form):
         except ValidationError as exc:
             self._reraise_on_field(exc, url_field)
         page.save()
+
+
+class ChangeProductForm(AddProductForm):
+    """Edit one product's name and its one to three shop pages."""
+
+    def __init__(self, product: Product, data: QueryDict | None = None) -> None:
+        """Prefill rows from this product's shop pages in primary-key order."""
+        self.product: Product = product
+        super().__init__(data, initial=self._prefill())
+
+    def pages_whose_prices_would_be_deleted(self) -> list[ShopPage]:
+        """Return pages this save would delete that already have a price.
+
+        Does not write. Call it only after the form has validated.
+        """
+        filled: set[str] = {
+            shop for shop, _url, _shop_field, _url_field in self._filled_row_values()
+        }
+        losing: list[ShopPage] = []
+        for page in self.product.shop_pages.order_by("pk"):
+            if str(page.shop) in filled:
+                continue
+            if page.observations.exists():
+                losing.append(page)
+        return losing
+
+    def save(self) -> Product:
+        """Update the product and its shop pages in one transaction.
+
+        A kept shop's URL is saved on the existing page before any delete.
+        A model error attaches to ``name`` or that row's URL and rolls the
+        transaction back.
+        """
+        self._refuse_if_unsavable()
+        rows: list[tuple[str, str, str, str]] = self._filled_row_values()
+        filled_shops: set[str] = {shop for shop, _url, _shop_field, _url_field in rows}
+        try:
+            with transaction.atomic():
+                self.product.name = self._required_cleaned("name")
+                self._store_product(self.product)
+                existing: dict[str, ShopPage] = {}
+                for page in self.product.shop_pages.order_by("pk"):
+                    existing[str(page.shop)] = page
+                for shop, url, _shop_field, url_field in rows:
+                    page = existing.get(shop)
+                    if page is None:
+                        continue
+                    page.url = url
+                    self._store_page(page, url_field)
+                self.product.shop_pages.exclude(shop__in=filled_shops).delete()
+                for shop, url, _shop_field, url_field in rows:
+                    if shop in existing:
+                        continue
+                    created = ShopPage(product=self.product, shop=shop, url=url)
+                    self._store_page(created, url_field)
+        except ValidationError:
+            self.product.refresh_from_db()
+            raise
+        return self.product
+
+    def _prefill(self) -> dict[str, str]:
+        """Return the name and up to three shop rows in primary-key order."""
+        initial: dict[str, str] = {"name": str(self.product.name)}
+        for shop_field, url_field in _PAGE_ROWS:
+            initial[shop_field] = ""
+            initial[url_field] = ""
+        pages = self.product.shop_pages.order_by("pk")
+        for (shop_field, url_field), page in zip(_PAGE_ROWS, pages):
+            initial[shop_field] = str(page.shop)
+            initial[url_field] = str(page.url)
+        return initial
+
+    def _refuse_if_unsavable(self) -> None:
+        """Raise before any write when the save would drop every page or a hidden one."""
+        if self.product.shop_pages.count() > len(_PAGE_ROWS):
+            self._raise_refused(
+                "This product has more shops than this form can save.",
+                None,
+            )
+        if not self._filled_row_values():
+            self._raise_refused(_AT_LEAST_ONE_PAGE, "shop_1")
+
+    def _raise_refused(self, message: str, field_name: str | None) -> NoReturn:
+        """Attach ``message`` and raise so nothing is written."""
+        error = ValidationError(message)
+        self.add_error(field_name, error)
+        raise error
