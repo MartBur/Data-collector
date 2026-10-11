@@ -46,7 +46,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | done |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | in-progress |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | ready |
-| S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | in-progress |
+| S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | done |
 
 ## Streams
 
@@ -147,7 +147,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Changing and removing are required, but they are off the path that proves the buy decision, so they follow the card. They become plannable once a product can be added.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -189,3 +189,4 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 - **S-01: user can sign in** — Archived 2026-10-10 → `context/archive/2026-10-07-account-sign-in/`. Lesson: —.
 - **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Implemented 2026-10-10 (`6efae28`). Change folder: `context/changes/add-tracked-product/`. Lesson: —.
 - **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Archived 2026-10-10 → `context/archive/2026-10-10-add-tracked-product/`. Lesson: —.
+- **S-05: user can change or remove a tracked product and its shop pages** — Archived 2026-10-11 → `context/archive/2026-10-10-edit-tracked-product/`. Lesson: —.
