@@ -252,10 +252,10 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 #### Automated
 
-- [x] 3.1 Home tests pass for name-only links in case-insensitive name order, a non-staff user opening a card from that list, and no prices on the home page: `uv run python manage.py test accounts.tests.test_home`
-- [x] 3.2 The project test suite passes: `uv run python manage.py test`
+- [x] 3.1 Home tests pass for name-only links in case-insensitive name order, a non-staff user opening a card from that list, and no prices on the home page: `uv run python manage.py test accounts.tests.test_home` — 9c95344
+- [x] 3.2 The project test suite passes: `uv run python manage.py test` — 9c95344
 
 #### Manual
 
-- [x] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card
-- [x] 3.4 As a staff user, the add-product link is still on the home page
+- [x] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card — 9c95344
+- [x] 3.4 As a staff user, the add-product link is still on the home page — 9c95344
