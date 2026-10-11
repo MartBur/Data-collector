@@ -1,7 +1,7 @@
 ---
 change_id: edit-tracked-product
 title: Change or remove a tracked product and its shop pages
-status: implemented
+status: impl_reviewed
 created: 2026-10-10
 updated: 2026-10-11
 archived_at: null
