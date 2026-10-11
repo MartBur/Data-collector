@@ -363,10 +363,10 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [ ] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices`
-- [ ] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock`
-- [ ] 1.3 The recording-run migration applies: `uv run python manage.py migrate`
-- [ ] 1.4 The project test suite passes: `uv run python manage.py test`
+- [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices`
+- [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock`
+- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate`
+- [x] 1.4 The project test suite passes: `uv run python manage.py test`
 
 ### Phase 2: Four-table start page
 

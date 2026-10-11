@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from prices import collect
 from prices.models import ShopPage
+from prices.recording_clock import mark_recording_finished
 
 
 class ShopRecordCommand(BaseCommand):
@@ -18,3 +19,4 @@ class ShopRecordCommand(BaseCommand):
             timezone.localdate(),
             self.stdout.write,
         )
+        mark_recording_finished(timezone.now())

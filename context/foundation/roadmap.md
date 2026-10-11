@@ -3,7 +3,7 @@ project: Data Collector
 version: 1
 status: draft
 created: 2026-09-22
-updated: 2026-10-11
+updated: 2026-10-12
 prd_version: 5
 main_goal: speed
 top_blocker: decisions
@@ -45,7 +45,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | done |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | done |
-| S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | planning |
+| S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | in-progress |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | done |
 
 ## Streams
@@ -135,7 +135,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Are the list owner's tracked products the preloaded favorites for that account? — Owner: user. Block: no.
   - Which timezone bounds the calendar day for "today"? — Owner: user. Block: no.
 - **Risk:** Same data prerequisites as the card, sequenced just after it so the decision screen is not delayed by the list. The shop names do not block this slice; it shows one number for the day, not each shop page.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-05: Change or remove a tracked product
 
