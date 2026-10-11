@@ -158,13 +158,13 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | yes                   | Implemented 2026-10-10                     | [#7](https://github.com/MartBur/Data-collector/issues/7) |
 | S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | yes         | S-01, S-02, and F-01 are done. Shop set is named | [#8](https://github.com/MartBur/Data-collector/issues/8) |
 | S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | yes                   | S-01, S-02, and F-01 are done              | [#9](https://github.com/MartBur/Data-collector/issues/9) |
-| S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | yes                   | S-02 is done                               | [#10](https://github.com/MartBur/Data-collector/issues/10) |
+| S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | yes                   | Archived 2026-10-11                        | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 
 ## Open Roadmap Questions
 
 1. **Which timezone bounds the calendar day for a price labeled today?** — Owner: user. Block: no. Planning may assume the owner's local day (Europe/Warsaw) until this is overridden. A previous calendar day must not be labeled today.
 
-Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), DOZ (https://www.doz.pl/), Super-Pharm (https://www.superpharm.pl/), and Gemini (https://gemini.pl/). Each tracked item still uses two or three pages from this set. Issue: [#11](https://github.com/MartBur/Data-collector/issues/11).
+Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), DOZ (https://www.doz.pl/), Super-Pharm (https://www.superpharm.pl/), and Gemini (https://gemini.pl/). Each tracked item uses one, two, or three pages from this set. Issue: [#11](https://github.com/MartBur/Data-collector/issues/11).
 
 ## Parked
 
