@@ -140,6 +140,8 @@ class ProductCardTests(TestCase):
         self.assertIn("Cheapest", rows[0])
         self.assertNotIn("10.00", rows[0])
         self.assertIn('href="https://www.doz.pl/p/alpecin"', rows[0])
+        self.assertIn('target="_blank"', rows[0])
+        self.assertIn('rel="noopener noreferrer"', rows[0])
         self.assertIn("Rossmann", rows[1])
         self.assertIn("19.99 PLN", rows[1])
         self.assertIn("Cheapest", rows[1])
@@ -174,6 +176,9 @@ class ProductCardTests(TestCase):
         self.assertNotIn("description", html.casefold())
         strokes = set(re.findall(r'<circle\b[^>]*stroke="(#[0-9a-fA-F]{6})"', html))
         self.assertEqual(len(strokes), 3)
+        self.assertNotIn("stroke-dasharray", html)
+        radii = set(re.findall(r"<circle\b[^>]*\sr=\"([^\"]+)\"", html))
+        self.assertEqual(radii, {"4"})
 
     def test_line_includes_dates_around_a_gap_and_omits_the_gap_point(self) -> None:
         today = timezone.localdate()
@@ -218,6 +223,10 @@ class ProductCardTests(TestCase):
         self.assertLess(gap_x, Decimal(points[1][0]))
         self.assertIn(f">{first.isoformat()}<", html)
         self.assertIn(f">{today.isoformat()}<", html)
+        self.assertIn('data-price="0.00"', html)
+        self.assertIn('data-price="10.00"', html)
+        self.assertIn('data-price="20.00"', html)
+        self.assertIn('data-legend="Rossmann"', html)
 
     def test_equal_amounts_draw_a_horizontal_line(self) -> None:
         today = timezone.localdate()
@@ -284,3 +293,22 @@ class ProductCardTests(TestCase):
         self.assertIn(f">{first.isoformat()}<", html)
         self.assertIn(f">{today.isoformat()}<", html)
         self.assertEqual(html.count("<svg"), 1)
+
+    def test_y_axis_starts_fifty_below_the_lowest_price_and_not_below_zero(
+        self,
+    ) -> None:
+        today = timezone.localdate()
+        product = self._product("Axis shampoo")
+        page = self._page(product, Shop.ROSSMANN, "https://www.rossmann.pl/p/axis")
+        self._observation(page, "80.00", today - timedelta(days=1))
+        self._observation(page, "90.00", today)
+        self._login()
+
+        response = self._open(product)
+
+        html = response.content.decode()
+        self.assertIn('data-price="30.00"', html)
+        self.assertIn('data-price="90.00"', html)
+        self.assertNotIn('data-price="0.00"', html)
+        self.assertNotIn('data-price="20.00"', html)
+        self.assertIn('data-legend="Rossmann"', html)

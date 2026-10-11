@@ -5,11 +5,12 @@
   <title>{{ product.name }}</title>
 </head>
 <body>
+  {% include "accounts/home_button.html" %}
   <p>{{ product.name }}</p>
   <ul>
     {% for shop in figures.shops %}
       <li>
-        <a href="{{ shop.url }}">{{ shop.label }}</a>
+        <a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>
         {% if shop.today_amount is None %}
           No price
         {% else %}
@@ -25,6 +26,11 @@
     <p>Lowest recorded price {{ figures.lowest_recorded|stringformat:".2f" }} PLN</p>
   {% endif %}
   <svg xmlns="http://www.w3.org/2000/svg" width="{{ chart.width }}" height="{{ chart.height }}" viewBox="0 0 {{ chart.width }} {{ chart.height }}">
+    <line x1="{{ chart.axis_x }}" y1="{{ chart.y_top }}" x2="{{ chart.axis_x }}" y2="{{ chart.axis_y }}" stroke="#222222" stroke-width="1"></line>
+    {% for tick in chart.y_ticks %}
+      <line x1="{{ chart.y_tick_x }}" y1="{{ tick.y }}" x2="{{ chart.axis_x }}" y2="{{ tick.y }}" stroke="#222222" stroke-width="1"></line>
+      <text data-price="{{ tick.label }}" x="{{ chart.y_label_x }}" y="{{ tick.y }}" fill="#222222" font-size="12" text-anchor="end" dominant-baseline="middle">{{ tick.label }}</text>
+    {% endfor %}
     <line x1="{{ chart.axis_x1 }}" y1="{{ chart.axis_y }}" x2="{{ chart.axis_x2 }}" y2="{{ chart.axis_y }}" stroke="#222222" stroke-width="1"></line>
     {% for tick in chart.ticks %}
       <line data-slot="{{ forloop.counter0 }}" x1="{{ tick }}" y1="{{ chart.axis_y }}" x2="{{ tick }}" y2="{{ chart.tick_y }}" stroke="#222222" stroke-width="1"></line>
@@ -33,7 +39,7 @@
     <text x="{{ chart.today_x }}" y="{{ chart.label_y }}" fill="#222222" font-size="12" text-anchor="end">{{ chart.today_label }}</text>
     {% for series in chart.series %}
       {% if series.draw_line %}
-        <polyline fill="none" stroke="{{ series.stroke }}" stroke-width="2"{% if series.dash %} stroke-dasharray="{{ series.dash }}"{% endif %} points="{{ series.line_points }}">
+        <polyline fill="none" stroke="{{ series.stroke }}" stroke-width="2" points="{{ series.line_points }}">
           {% for point in series.points %}
             <title>{{ point.observed_on }} {{ point.amount }}</title>
           {% endfor %}
@@ -44,6 +50,10 @@
           <title>{{ point.observed_on }} {{ point.amount }}</title>
         </circle>
       {% endfor %}
+    {% endfor %}
+    {% for series in chart.series %}
+      <line x1="{{ chart.legend_mark_x1 }}" y1="{{ series.legend_y }}" x2="{{ chart.legend_mark_x2 }}" y2="{{ series.legend_y }}" stroke="{{ series.stroke }}" stroke-width="2"></line>
+      <text data-legend="{{ series.label }}" x="{{ chart.legend_text_x }}" y="{{ series.legend_y }}" fill="#222222" font-size="12" dominant-baseline="middle">{{ series.label }}</text>
     {% endfor %}
   </svg>
 </body>

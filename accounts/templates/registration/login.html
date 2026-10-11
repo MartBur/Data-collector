@@ -5,6 +5,7 @@
   <title>Sign in</title>
 </head>
 <body>
+  {% include "accounts/home_button.html" %}
   <form method="post" action="">
     {% csrf_token %}
     {{ form.as_p }}

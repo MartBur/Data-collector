@@ -27,6 +27,10 @@ On 10 October 2026 the home page lists every tracked product by name and shows n
 | Drawing the chart | Inline SVG in the page | The app has no chart library or script files | Plan |
 | Shop order on the card | Shop-page insert order | The add confirmation already lists pages that way | Plan |
 | Home name order | Case-insensitive name, then id | The list is for finding a product | Plan |
+| Y-axis floor | Lowest chart price minus 50 PLN, never below 0 | Ticks then continue every 10 PLN through the highest chart price | Plan |
+| Chart legend | Shop name and a sample of its line, inside the chart to the right of the plot | A reader can tell which line is which shop | Plan |
+| Shop link | Opens the shop page in a new tab | The card stays open | Plan |
+| Product list name | Same-tab link to that product's card | `/products/` is the staff list, and the name is how a staff user opens the card | Plan |
 
 ## Scope
 
@@ -37,6 +41,8 @@ On 10 October 2026 the home page lists every tracked product by name and shows n
 - A 30-date SVG with one line per shop, connecting across empty days
 - The lowest recorded price, including dates outside the chart
 - Name-only links to those cards on the signed-in home page
+- A Home link to the main page on every screen
+- A Y axis, a shop legend, new-tab shop links, and a same-tab product name on `/products/`
 
 **Out of scope:**
 
@@ -55,7 +61,8 @@ Home loads every product, sorted by case-insensitive name, then id. The card vie
 | --- | --- | --- |
 | 1. Card figures | Tested numbers for the window, gaps, ties, and the all-time low | A raw minimum would treat a superseded same-day amount as the low |
 | 2. Card page | The login-required screen and SVG | The line can look like a price existed on an empty day |
-| 3. Home links | Name-only links for every signed-in user | Prices leaking onto home would take over the next slice |
+| 3. Home links | Name-only links, plus a Home control on every page | Prices leaking onto home would take over the next slice |
+| 4. Chart reading | Y axis, legend, and the two link targets | A 50 PLN offset below a cheap price would go negative |
 
 **Prerequisites:** Sign-in, add-product, and calendar-day prices are done. `TIME_ZONE` is already `Europe/Warsaw`. No new packages.
 **Estimated effort:** About 2 sessions across 3 phases for one person after hours.
@@ -72,3 +79,4 @@ Home loads every product, sorted by case-insensitive name, then id. The card vie
 - A signed-in user opens a product from the home list by name.
 - The card shows today's shop prices, marks every cheapest shop, links to each shop page, and shows No price when today has no row.
 - The chart is 30 dates through today, one line per shop connecting across empty days, and the lowest recorded price is shown even when it is older than the chart.
+- The Y axis starts 50 PLN below the lowest chart price and not below zero, each line is named, a shop link opens a new tab, and a product name on `/products/` opens the card in the same tab.

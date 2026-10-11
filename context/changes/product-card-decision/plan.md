@@ -2,7 +2,7 @@
 
 ## Overview
 
-A signed-in user can open a tracked product from a name-only list, compare each shop's price for today, read a 30-day history with one line per shop, see the lowest price ever recorded, and follow a link to that product in that shop.
+A signed-in user can open a tracked product from a name-only list, compare each shop's price for today, read a 30-day history with one line per shop, see the lowest price ever recorded, and follow a link to that product in that shop. The chart has a Y axis and a legend, shop links open in a new tab, and each name on `/products/` opens that product's card in the same tab.
 
 ## Current State Analysis
 
@@ -155,7 +155,7 @@ The page does not show a description, availability, shipping, a horizon control,
 
 ### Overview
 
-The signed-in home page lists every tracked product by name and links each name to its card, with no prices.
+The signed-in home page lists every tracked product by name and links each name to its card, with no prices. Every page has a Home link back to that main page.
 
 ### Changes Required:
 
@@ -175,17 +175,75 @@ The signed-in home page lists every tracked product by name and links each name 
 
 **Contract**: Django `TestCase`. With two products whose case-insensitive names sort opposite to their ids, the earlier name's link appears first and both hrefs point at `/products/<pk>/`. A non-staff user can open one of those links and see the product name. A product that has a stored price still does not put that amount, `PLN`, `Cheapest`, or `No price` on the home page. Zero products leaves the username and sign-out, and no `/products/<pk>/` link. A staff user still sees the add-product link.
 
+#### 3. Home button
+
+**File**: `accounts/templates/accounts/home_button.html`, and every app page template
+
+**Intent**: From any screen, the user can return to the main page in the same tab.
+
+**Contract**: One shared snippet renders `<a href="{% url 'home' %}">Home</a>`. It is included at the top of the sign-in page, the home page, the product card, `/products/`, and the add, change, and remove screens. The link has no `target` attribute. `accounts/tests/test_home.py` loads the sign-in page, home, `/products/`, add, a card, change, and the remove confirmation, and each response contains that Home link.
+
 ### Success Criteria:
 
 #### Automated Verification:
 
 - Home tests pass for name-only links in case-insensitive name order, a non-staff user opening a card from that list, and no prices on the home page: `uv run python manage.py test accounts.tests.test_home`
 - The project test suite passes: `uv run python manage.py test`
+- The Home link is present on the sign-in page, home, the product list, add, a card, change, and the remove confirmation: `uv run python manage.py test accounts.tests.test_home.HomeTests.test_home_button_is_on_every_page`
 
 #### Manual Verification:
 
 - Sign in as a non-staff user, open a product from the home list, and land on its card
 - As a staff user, the add-product link is still on the home page
+- From the sign-in page, a product card, and /products/, click Home and land on the main page
+
+**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
+
+---
+
+## Phase 4: Chart axis, legend, and link targets
+
+### Overview
+
+Give the card chart a Y axis and a shop legend, open each shop page in a new tab, and make each product name on `/products/` open that product's card in the same tab.
+
+### Changes Required:
+
+#### 1. Y axis and legend
+
+**File**: `prices/views.py`, `prices/templates/prices/product_card.html`
+
+**Intent**: A reader can read the price scale and tell which line belongs to which shop.
+
+**Contract**: The Y axis uses prices inside the 30-day window. Its first tick is that window's lowest price minus 50 PLN, and that tick is never below 0.00. Further ticks are every 10 PLN from that first tick up through a tick at or above the window's highest price. Prices of 80.00 and 90.00 start the axis at 30.00 and include 90.00. Prices of 18.00 and 19.99 start the axis at 0.00 and include 10.00 and 20.00. A chart with no prices has no Y ticks. Each shop that has at least one point in the window is named inside the chart, to the right of the plot, with a short sample of its line and its shop name. Shops with no point in the window stay out of the legend.
+
+#### 2. Shop link and product-list name
+
+**File**: `prices/templates/prices/product_card.html`, `prices/templates/prices/product_list.html`
+
+**Intent**: Leaving for a shop does not replace the card, and a staff user can open a card from the tracked-product list.
+
+**Contract**: Each shop anchor on the card keeps the stored page URL and opens it in a new tab (`target="_blank"` and `rel="noopener noreferrer"`). On `/products/`, the product name is a link to `prices:product_card` for that id and opens in the same tab. The change and remove controls stay as they are.
+
+#### 3. Tests
+
+**File**: `prices/tests/test_product_card.py`, `prices/tests/test_product_list.py`
+
+**Intent**: Lock the axis floor, the legend, the new tab, and the same-tab name link.
+
+**Contract**: The card tests assert `data-price="0.00"` when the window's lowest price is 18.00, and `data-price="30.00"` plus `data-price="90.00"` when the window's prices are 80.00 and 90.00. They assert `data-legend` for a drawn shop, and `target="_blank"` on a shop href. The product-list test asserts the name is an anchor to `/products/<pk>/` and that the list page has no `target="_blank"`.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- Card and product-list tests pass for a Y axis that starts 50 below the lowest chart price and not below zero, a legend naming each drawn shop, a shop link that opens in a new tab, and a product name on /products/ that opens the card in the same tab: `uv run python manage.py test prices.tests.test_product_card prices.tests.test_product_list`
+
+#### Manual Verification:
+
+- On a product whose lowest chart price is above 50 PLN, the Y axis starts at that price minus 50, labels continue every 10 PLN, and each drawn line has its shop name and color under the chart
+- On a product whose lowest chart price is below 50 PLN, the Y axis starts at 0.00
+- A shop name on the card opens that shop page in a new tab, and a product name on /products/ opens the card in the same tab
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
 
@@ -200,7 +258,8 @@ The signed-in home page lists every tracked product by name and links each name 
 
 ### Integration Tests:
 
-- `prices/tests/test_product_card.py` owns auth, 404, and the rendered phrases and SVG dates.
+- `prices/tests/test_product_card.py` owns auth, 404, the rendered phrases, SVG dates, the Y-axis floor, the shop legend, and the new-tab shop link.
+- `prices/tests/test_product_list.py` owns the same-tab product-name link on `/products/`.
 - `accounts/tests/test_home.py` owns the name list, its order, and the absence of prices.
 - Page tests take `today` from `timezone.localdate()` once per test and build rows relative to that date.
 
@@ -209,6 +268,10 @@ The signed-in home page lists every tracked product by name and links each name 
 1. Record or insert prices so one shop has a gap inside the last 30 Warsaw days, one shop has no row today, and the lowest daily price is older than the window.
 2. Sign in as a non-staff user, open the product from home, and check the line, the empty day, No price, the shop link, and Lowest recorded price.
 3. Sign in as staff and confirm the add-product link is still on home.
+4. From the sign-in page, a product card, and `/products/`, click Home and confirm the main page opens in the same tab.
+5. On a product whose prices in the chart are 80.00 and 90.00, confirm the Y axis starts at 30.00 and steps by 10.00, and that the legend names the shop.
+6. On a product whose lowest chart price is below 50 PLN, confirm the Y axis starts at 0.00.
+7. Click a shop name on the card and confirm the shop page opens in a new tab. On `/products/`, click a product name and confirm the card opens in the same tab.
 
 ## Performance Considerations
 
@@ -259,3 +322,17 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 - [x] 3.3 Sign in as a non-staff user, open a product from the home list, and land on its card — 9c95344
 - [x] 3.4 As a staff user, the add-product link is still on the home page — 9c95344
+- [x] 3.5 The Home link is present on the sign-in page, home, the product list, add, a card, change, and the remove confirmation: `uv run python manage.py test accounts.tests.test_home.HomeTests.test_home_button_is_on_every_page`
+- [x] 3.6 From the sign-in page, a product card, and /products/, click Home and land on the main page
+
+### Phase 4: Chart axis, legend, and link targets
+
+#### Automated
+
+- [x] 4.1 Card and product-list tests pass for a Y axis that starts 50 below the lowest chart price and not below zero, a legend naming each drawn shop, a shop link that opens in a new tab, and a product name on /products/ that opens the card in the same tab: `uv run python manage.py test prices.tests.test_product_card prices.tests.test_product_list`
+
+#### Manual
+
+- [x] 4.2 On a product whose lowest chart price is above 50 PLN, the Y axis starts at that price minus 50, labels continue every 10 PLN, and each drawn line has its shop name and color under the chart
+- [x] 4.3 On a product whose lowest chart price is below 50 PLN, the Y axis starts at 0.00
+- [x] 4.4 A shop name on the card opens that shop page in a new tab, and a product name on /products/ opens the card in the same tab

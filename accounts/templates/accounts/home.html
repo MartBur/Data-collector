@@ -5,6 +5,7 @@
   <title>Signed in</title>
 </head>
 <body>
+  {% include "accounts/home_button.html" %}
   <p>{{ user.get_username }}</p>
   {% if user.is_staff %}
     <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>

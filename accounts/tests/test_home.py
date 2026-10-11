@@ -96,3 +96,34 @@ class HomeTests(TestCase):
         self.assertContains(response, 'href="/products/add/"')
         self.assertContains(response, "Tracked products")
         self.assertContains(response, 'href="/products/"')
+
+    def test_home_button_is_on_every_page(self) -> None:
+        login = self.client.get("/accounts/login/")
+        self.assertContains(login, '<a href="/">Home</a>')
+        self._login(is_staff=True)
+        product = Product.objects.create(name="Home button shampoo")
+        page = ShopPage.objects.create(
+            product=product,
+            shop=Shop.ROSSMANN,
+            url="https://www.rossmann.pl/p/home-button",
+        )
+        PriceObservation.objects.create(
+            shop_page=page,
+            amount=Decimal("19.99"),
+            observed_date=timezone.localdate(),
+        )
+        addresses = (
+            "/",
+            "/products/",
+            "/products/add/",
+            f"/products/{product.pk}/",
+            f"/products/{product.pk}/change/",
+        )
+        for address in addresses:
+            response = self.client.get(address)
+            self.assertEqual(response.status_code, 200, address)
+            self.assertContains(response, '<a href="/">Home</a>')
+        confirm = self.client.post(f"/products/{product.pk}/remove/")
+        self.assertEqual(confirm.status_code, 200)
+        self.assertContains(confirm, '<a href="/">Home</a>')
+        self.assertContains(confirm, "Confirm removal")

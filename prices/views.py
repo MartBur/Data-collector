@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_CEILING, Decimal
 from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
@@ -281,15 +281,20 @@ def remove_product(request: HttpRequest, pk: int) -> HttpResponse:
     return redirect("prices:product_list")
 
 
-_CHART_WIDTH: int = 680
+_CHART_WIDTH: int = 720
 _CHART_HEIGHT: int = 220
-_PLOT_LEFT: Decimal = Decimal("48")
-_PLOT_RIGHT: Decimal = Decimal("640")
+_PLOT_LEFT: Decimal = Decimal("72")
+_PLOT_RIGHT: Decimal = Decimal("500")
 _PLOT_TOP: Decimal = Decimal("28")
 _PLOT_BOTTOM: Decimal = Decimal("160")
+_Y_ORIGIN_GAP: Decimal = Decimal("50")
+_Y_TICK_STEP: Decimal = Decimal("10")
+_LEGEND_MARK_X1: Decimal = Decimal("516")
+_LEGEND_MARK_X2: Decimal = Decimal("544")
+_LEGEND_TEXT_X: Decimal = Decimal("552")
+_LEGEND_STEP: Decimal = Decimal("22")
 _SERIES_STROKES: tuple[str, ...] = ("#1f4e79", "#b85c38", "#2f6b4f", "#6b3fa0")
-_SERIES_DASHES: tuple[str, ...] = ("", "7 3", "2 2", "9 2 2 2")
-_SERIES_RADII: tuple[str, ...] = ("3.5", "5", "4", "6")
+_POINT_RADIUS: str = "4"
 
 
 class ChartPoint(TypedDict):
@@ -303,25 +308,38 @@ class ChartSeries(TypedDict):
     label: str
     stroke: str
     radius: str
-    dash: str
     draw_line: bool
     line_points: str
     points: list[ChartPoint]
+    legend_y: str
+
+
+class ChartYTick(TypedDict):
+    y: str
+    label: str
 
 
 class ChartPlot(TypedDict):
     width: int
     height: int
+    axis_x: str
     axis_x1: str
     axis_x2: str
     axis_y: str
+    y_top: str
+    y_tick_x: str
+    y_label_x: str
     tick_y: str
     label_y: str
     first_label: str
     first_x: str
     today_label: str
     today_x: str
+    legend_mark_x1: str
+    legend_mark_x2: str
+    legend_text_x: str
     ticks: list[str]
+    y_ticks: list[ChartYTick]
     series: list[ChartSeries]
 
 
@@ -358,17 +376,42 @@ def _window_bounds(figures: CardFigures) -> tuple[Decimal, Decimal] | None:
 
 
 def _y_for_amount(amount: Decimal, low: Decimal, high: Decimal) -> Decimal:
-    """Map a price onto the plot, on one horizontal line when all prices match."""
+    """Map a price onto the plot between the axis floor and the axis top."""
     if low == high:
         return (_PLOT_TOP + _PLOT_BOTTOM) / Decimal(2)
     span = _PLOT_BOTTOM - _PLOT_TOP
     return _PLOT_BOTTOM - (amount - low) * span / (high - low)
 
 
-def _series_style(index: int) -> tuple[str, str, str]:
-    """Return one shop's stroke, dash pattern, and marker radius."""
-    slot = index % len(_SERIES_STROKES)
-    return (_SERIES_STROKES[slot], _SERIES_DASHES[slot], _SERIES_RADII[slot])
+def _axis_floor(lowest: Decimal) -> Decimal:
+    """Return the Y-axis start: 50 below the lowest price, and never below zero."""
+    lowered = lowest - _Y_ORIGIN_GAP
+    if lowered < 0:
+        return Decimal("0")
+    return lowered
+
+
+def _axis_ceiling(floor: Decimal, highest: Decimal) -> Decimal:
+    """Return the top tick, a 10 PLN step at or above the highest price."""
+    if highest <= floor:
+        return floor + _Y_TICK_STEP
+    steps = ((highest - floor) / _Y_TICK_STEP).to_integral_value(ROUND_CEILING)
+    return floor + steps * _Y_TICK_STEP
+
+
+def _price_ticks(floor: Decimal, ceiling: Decimal) -> list[Decimal]:
+    """Return Y-axis labels from the floor up to the ceiling, every 10 PLN."""
+    ticks: list[Decimal] = []
+    value = floor
+    while value <= ceiling:
+        ticks.append(value)
+        value += _Y_TICK_STEP
+    return ticks
+
+
+def _series_stroke(index: int) -> str:
+    """Return one shop's color. Every shop uses the same line and point."""
+    return _SERIES_STROKES[index % len(_SERIES_STROKES)]
 
 
 def _chart_plot(figures: CardFigures) -> ChartPlot:
@@ -376,6 +419,20 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
     dates = figures["dates"]
     count = len(dates)
     bounds = _window_bounds(figures)
+    scale: tuple[Decimal, Decimal] | None = None
+    y_ticks: list[ChartYTick] = []
+    if bounds is not None:
+        lowest, highest = bounds
+        floor = _axis_floor(lowest)
+        ceiling = _axis_ceiling(floor, highest)
+        scale = (floor, ceiling)
+        y_ticks = [
+            {
+                "y": _two_decimals(_y_for_amount(price, floor, ceiling)),
+                "label": _two_decimals(price),
+            }
+            for price in _price_ticks(floor, ceiling)
+        ]
     ticks = [_two_decimals(_slot_x(index, count)) for index in range(count)]
     plotted: list[ChartSeries] = []
     for index, shop_series in enumerate(figures["series"]):
@@ -383,9 +440,9 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
         for slot, (day, amount) in enumerate(
             zip(dates, shop_series["amounts"], strict=True)
         ):
-            if amount is None or bounds is None:
+            if amount is None or scale is None:
                 continue
-            low, high = bounds
+            low, high = scale
             points.append(
                 {
                     "x": _two_decimals(_slot_x(slot, count)),
@@ -396,7 +453,7 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
             )
         if not points:
             continue
-        stroke, dash, radius = _series_style(index)
+        stroke = _series_stroke(index)
         draw_line = len(points) >= 2
         line_points = (
             " ".join(f"{point['x']},{point['y']}" for point in points)
@@ -407,11 +464,13 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
             {
                 "label": shop_series["label"],
                 "stroke": stroke,
-                "radius": radius,
-                "dash": dash,
+                "radius": _POINT_RADIUS,
                 "draw_line": draw_line,
                 "line_points": line_points,
                 "points": points,
+                "legend_y": _two_decimals(
+                    _PLOT_TOP + Decimal(len(plotted)) * _LEGEND_STEP
+                ),
             }
         )
     if ticks:
@@ -423,15 +482,23 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
     return {
         "width": _CHART_WIDTH,
         "height": _CHART_HEIGHT,
+        "axis_x": _two_decimals(_PLOT_LEFT),
         "axis_x1": first_x,
         "axis_x2": today_x,
         "axis_y": _two_decimals(_PLOT_BOTTOM),
+        "y_top": y_ticks[-1]["y"] if y_ticks else _two_decimals(_PLOT_TOP),
+        "y_tick_x": _two_decimals(_PLOT_LEFT - Decimal("6")),
+        "y_label_x": _two_decimals(_PLOT_LEFT - Decimal("10")),
         "tick_y": _two_decimals(_PLOT_BOTTOM + Decimal("6")),
+        "y_ticks": y_ticks,
         "label_y": _two_decimals(_PLOT_BOTTOM + Decimal("22")),
         "first_label": dates[0].isoformat() if dates else "",
         "first_x": first_x,
         "today_label": dates[-1].isoformat() if dates else "",
         "today_x": today_x,
+        "legend_mark_x1": _two_decimals(_LEGEND_MARK_X1),
+        "legend_mark_x2": _two_decimals(_LEGEND_MARK_X2),
+        "legend_text_x": _two_decimals(_LEGEND_TEXT_X),
         "ticks": ticks,
         "series": plotted,
     }
