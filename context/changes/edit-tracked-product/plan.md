@@ -315,29 +315,29 @@ No schema migration. Existing products stay. A product that already has one shop
 
 #### Automated
 
-- [x] 2.1 `uv run python manage.py test prices.tests.test_product_list` passes
-- [x] 2.2 Anonymous GET `/products/` redirects to the login page
-- [x] 2.3 Non-staff GET `/products/` returns 403
-- [x] 2.4 Staff GET `/products/` lists every product by stripped casefolded name, then pk, each with its shop display names in pk order
-- [x] 2.5 Staff home links to `/products/` with the text "Tracked products"; non-staff home does not
+- [x] 2.1 `uv run python manage.py test prices.tests.test_product_list` passes — fb88eaf
+- [x] 2.2 Anonymous GET `/products/` redirects to the login page — fb88eaf
+- [x] 2.3 Non-staff GET `/products/` returns 403 — fb88eaf
+- [x] 2.4 Staff GET `/products/` lists every product by stripped casefolded name, then pk, each with its shop display names in pk order — fb88eaf
+- [x] 2.5 Staff home links to `/products/` with the text "Tracked products"; non-staff home does not — fb88eaf
 
 #### Manual
 
-- [ ] 2.6 A staff user opens home, follows "Tracked products", and sees each product name with its shops
-- [ ] 2.7 With no products, the list shows "No tracked products."
+- [x] 2.6 A staff user opens home, follows "Tracked products", and sees each product name with its shops — fb88eaf
+- [x] 2.7 With no products, the list shows "No tracked products." — fb88eaf
 
 ### Phase 3: Change a tracked product
 
 #### Automated
 
-- [ ] 3.1 `uv run python manage.py test prices.tests.test_change_product` passes
-- [ ] 3.2 Replacing a shop page URL with another URL for the same shop keeps that page's primary key and its price observations
-- [ ] 3.3 Switching a shop that has prices writes nothing until confirm is posted, then deletes the old page's prices and leaves the new page with none
-- [ ] 3.4 A rename that keeps the same shops and URLs saves with no confirm step and keeps every price observation
-- [ ] 3.5 Clearing every shop row stores nothing
-- [ ] 3.6 A one-page product can be renamed and saved, and switching its only shop is allowed when the new set still has one page
-- [ ] 3.7 Change on a product with four shop pages writes nothing
-- [ ] 3.8 Non-staff POST returns 403, and a successful change redirects to `/products/`
+- [x] 3.1 `uv run python manage.py test prices.tests.test_change_product` passes
+- [x] 3.2 Replacing a shop page URL with another URL for the same shop keeps that page's primary key and its price observations
+- [x] 3.3 Switching a shop that has prices writes nothing until confirm is posted, then deletes the old page's prices and leaves the new page with none
+- [x] 3.4 A rename that keeps the same shops and URLs saves with no confirm step and keeps every price observation
+- [x] 3.5 Clearing every shop row stores nothing
+- [x] 3.6 A one-page product can be renamed and saved, and switching its only shop is allowed when the new set still has one page
+- [x] 3.7 Change on a product with four shop pages writes nothing
+- [x] 3.8 Non-staff POST returns 403, and a successful change redirects to `/products/`
 
 #### Manual
 

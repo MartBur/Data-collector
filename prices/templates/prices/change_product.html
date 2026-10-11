@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Change product</title>
+</head>
+<body>
+  {% if too_many_shops %}
+    <p>This product has more shops than this form can save.</p>
+  {% elif confirm_pages %}
+    <p>{{ product.name }}</p>
+    <ul>
+      {% for page in confirm_pages %}
+        <li>{{ page.get_shop_display }}</li>
+      {% endfor %}
+    </ul>
+    <p>recorded prices will be deleted</p>
+    <form method="post" action="{% url 'prices:change_product' product.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="name" value="{{ form.name.value|default_if_none:'' }}">
+      <input type="hidden" name="shop_1" value="{{ form.shop_1.value|default_if_none:'' }}">
+      <input type="hidden" name="url_1" value="{{ form.url_1.value|default_if_none:'' }}">
+      <input type="hidden" name="shop_2" value="{{ form.shop_2.value|default_if_none:'' }}">
+      <input type="hidden" name="url_2" value="{{ form.url_2.value|default_if_none:'' }}">
+      <input type="hidden" name="shop_3" value="{{ form.shop_3.value|default_if_none:'' }}">
+      <input type="hidden" name="url_3" value="{{ form.url_3.value|default_if_none:'' }}">
+      <input type="hidden" name="confirm" value="yes">
+      <button type="submit">Confirm</button>
+    </form>
+    <a href="{% url 'prices:product_list' %}">Cancel</a>
+  {% else %}
+    <form method="post" action="{% url 'prices:change_product' product.pk %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save</button>
+    </form>
+  {% endif %}
+</body>
+</html>

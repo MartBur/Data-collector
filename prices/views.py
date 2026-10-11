@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Prefetch
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from prices.forms import AddProductForm
+from prices.forms import AddProductForm, ChangeProductForm
 from prices.models import Product, ShopPage
 
 _MAX_ADDED_PK: int = 2**63 - 1
@@ -96,3 +96,80 @@ def product_list(request: HttpRequest) -> HttpResponse:
         raise PermissionDenied
     context: ProductListPage = {"products": _products_for_list()}
     return render(request, "prices/product_list.html", context)
+
+
+_MAX_CHANGE_SHOPS: int = 3
+
+
+class ChangeProductPage(TypedDict):
+    product: Product
+    form: ChangeProductForm | None
+    confirm_pages: list[ShopPage]
+    too_many_shops: bool
+
+
+def _product_has_too_many_shop_pages(product: Product) -> bool:
+    """Return True when the product has more shop pages than the change form can save."""
+    return product.shop_pages.count() > _MAX_CHANGE_SHOPS
+
+
+def _change_confirmed(request: HttpRequest) -> bool:
+    """Return True when the post includes a non-empty confirm flag."""
+    confirm = request.POST.get("confirm")
+    if not isinstance(confirm, str):
+        return False
+    return confirm.strip() != ""
+
+
+def _change_page(
+    product: Product,
+    form: ChangeProductForm | None,
+    confirm_pages: list[ShopPage],
+    too_many_shops: bool,
+) -> ChangeProductPage:
+    """Build the change-product template context."""
+    return {
+        "product": product,
+        "form": form,
+        "confirm_pages": confirm_pages,
+        "too_many_shops": too_many_shops,
+    }
+
+
+@login_required
+def change_product(request: HttpRequest, pk: int) -> HttpResponse:
+    """Show the change form, or save a correction and return to the list.
+
+    A save that would delete a recorded price renders a confirm step and
+    writes nothing until the confirm flag is posted.
+    """
+    if not request.user.is_staff:
+        raise PermissionDenied
+    product = get_object_or_404(Product, pk=pk)
+    if _product_has_too_many_shop_pages(product):
+        return render(
+            request,
+            "prices/change_product.html",
+            _change_page(product, None, [], True),
+        )
+    confirm_pages: list[ShopPage] = []
+    if request.method == "POST":
+        form = ChangeProductForm(product, request.POST)
+        if form.is_valid():
+            losing = form.pages_whose_prices_would_be_deleted()
+            if losing and not _change_confirmed(request):
+                confirm_pages = losing
+            else:
+                try:
+                    form.save()
+                except ValidationError:
+                    pass
+                else:
+                    return redirect("prices:product_list")
+    else:
+        form = ChangeProductForm(product)
+    return render(
+        request,
+        "prices/change_product.html",
+        _change_page(product, form, confirm_pages, False),
+    )
