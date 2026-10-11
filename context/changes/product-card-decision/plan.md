@@ -240,8 +240,8 @@ No schema change and no backfill. The card reads products, shop pages, and obser
 
 #### Automated
 
-- [ ] 2.1 Product card tests pass for the sign-in redirect, a non-staff user, an unknown product, today's price, a shop with no price, every tied cheapest shop, the lowest recorded price, the shop link, and a line across a gap: `uv run python manage.py test prices.tests.test_product_card`
-- [ ] 2.2 Prices tests still pass: `uv run python manage.py test prices`
+- [x] 2.1 Product card tests pass for the sign-in redirect, a non-staff user, an unknown product, today's price, a shop with no price, every tied cheapest shop, the lowest recorded price, the shop link, and a line across a gap: `uv run python manage.py test prices.tests.test_product_card`
+- [x] 2.2 Prices tests still pass: `uv run python manage.py test prices`
 
 #### Manual
 

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
@@ -6,8 +7,10 @@ from django.db.models import Prefetch
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from prices.card import CardFigures, card_figures
 from prices.forms import AddProductForm, ChangeProductForm
 from prices.models import PriceObservation, Product, ShopPage
 
@@ -276,3 +279,172 @@ def remove_product(request: HttpRequest, pk: int) -> HttpResponse:
         return _render_remove_confirm(request, product, pages, action)
     product.delete()
     return redirect("prices:product_list")
+
+
+_CHART_WIDTH: int = 680
+_CHART_HEIGHT: int = 220
+_PLOT_LEFT: Decimal = Decimal("48")
+_PLOT_RIGHT: Decimal = Decimal("640")
+_PLOT_TOP: Decimal = Decimal("28")
+_PLOT_BOTTOM: Decimal = Decimal("160")
+_SERIES_STROKES: tuple[str, ...] = ("#1f4e79", "#b85c38", "#2f6b4f", "#6b3fa0")
+_SERIES_DASHES: tuple[str, ...] = ("", "7 3", "2 2", "9 2 2 2")
+_SERIES_RADII: tuple[str, ...] = ("3.5", "5", "4", "6")
+
+
+class ChartPoint(TypedDict):
+    x: str
+    y: str
+    observed_on: str
+    amount: str
+
+
+class ChartSeries(TypedDict):
+    label: str
+    stroke: str
+    radius: str
+    dash: str
+    draw_line: bool
+    line_points: str
+    points: list[ChartPoint]
+
+
+class ChartPlot(TypedDict):
+    width: int
+    height: int
+    axis_x1: str
+    axis_x2: str
+    axis_y: str
+    tick_y: str
+    label_y: str
+    first_label: str
+    first_x: str
+    today_label: str
+    today_x: str
+    ticks: list[str]
+    series: list[ChartSeries]
+
+
+class ProductCardPage(TypedDict):
+    product: Product
+    figures: CardFigures
+    chart: ChartPlot
+
+
+def _two_decimals(value: Decimal) -> str:
+    """Format one amount or coordinate with two decimal places."""
+    return f"{value:.2f}"
+
+
+def _slot_x(index: int, count: int) -> Decimal:
+    """Return the x position of one date slot, evenly spaced across the plot."""
+    if count <= 1:
+        return _PLOT_LEFT
+    span = _PLOT_RIGHT - _PLOT_LEFT
+    return _PLOT_LEFT + span * Decimal(index) / Decimal(count - 1)
+
+
+def _window_bounds(figures: CardFigures) -> tuple[Decimal, Decimal] | None:
+    """Return the lowest and highest priced amount inside the chart window."""
+    priced: list[Decimal] = [
+        amount
+        for series in figures["series"]
+        for amount in series["amounts"]
+        if amount is not None
+    ]
+    if not priced:
+        return None
+    return min(priced), max(priced)
+
+
+def _y_for_amount(amount: Decimal, low: Decimal, high: Decimal) -> Decimal:
+    """Map a price onto the plot, on one horizontal line when all prices match."""
+    if low == high:
+        return (_PLOT_TOP + _PLOT_BOTTOM) / Decimal(2)
+    span = _PLOT_BOTTOM - _PLOT_TOP
+    return _PLOT_BOTTOM - (amount - low) * span / (high - low)
+
+
+def _series_style(index: int) -> tuple[str, str, str]:
+    """Return one shop's stroke, dash pattern, and marker radius."""
+    slot = index % len(_SERIES_STROKES)
+    return (_SERIES_STROKES[slot], _SERIES_DASHES[slot], _SERIES_RADII[slot])
+
+
+def _chart_plot(figures: CardFigures) -> ChartPlot:
+    """Build even date slots and a mark for each shop day that has a price."""
+    dates = figures["dates"]
+    count = len(dates)
+    bounds = _window_bounds(figures)
+    ticks = [_two_decimals(_slot_x(index, count)) for index in range(count)]
+    plotted: list[ChartSeries] = []
+    for index, shop_series in enumerate(figures["series"]):
+        points: list[ChartPoint] = []
+        for slot, (day, amount) in enumerate(
+            zip(dates, shop_series["amounts"], strict=True)
+        ):
+            if amount is None or bounds is None:
+                continue
+            low, high = bounds
+            points.append(
+                {
+                    "x": _two_decimals(_slot_x(slot, count)),
+                    "y": _two_decimals(_y_for_amount(amount, low, high)),
+                    "observed_on": day.isoformat(),
+                    "amount": _two_decimals(amount),
+                }
+            )
+        if not points:
+            continue
+        stroke, dash, radius = _series_style(index)
+        draw_line = len(points) >= 2
+        line_points = (
+            " ".join(f"{point['x']},{point['y']}" for point in points)
+            if draw_line
+            else ""
+        )
+        plotted.append(
+            {
+                "label": shop_series["label"],
+                "stroke": stroke,
+                "radius": radius,
+                "dash": dash,
+                "draw_line": draw_line,
+                "line_points": line_points,
+                "points": points,
+            }
+        )
+    if ticks:
+        first_x = ticks[0]
+        today_x = ticks[-1]
+    else:
+        first_x = _two_decimals(_PLOT_LEFT)
+        today_x = _two_decimals(_PLOT_RIGHT)
+    return {
+        "width": _CHART_WIDTH,
+        "height": _CHART_HEIGHT,
+        "axis_x1": first_x,
+        "axis_x2": today_x,
+        "axis_y": _two_decimals(_PLOT_BOTTOM),
+        "tick_y": _two_decimals(_PLOT_BOTTOM + Decimal("6")),
+        "label_y": _two_decimals(_PLOT_BOTTOM + Decimal("22")),
+        "first_label": dates[0].isoformat() if dates else "",
+        "first_x": first_x,
+        "today_label": dates[-1].isoformat() if dates else "",
+        "today_x": today_x,
+        "ticks": ticks,
+        "series": plotted,
+    }
+
+
+@login_required
+def product_card(request: HttpRequest, pk: int) -> HttpResponse:
+    """Show one tracked product's shop prices and 30-day chart."""
+    product = get_object_or_404(Product, pk=pk)
+    figures = card_figures(product, timezone.localdate())
+    context: ProductCardPage = {
+        "product": product,
+        "figures": figures,
+        "chart": _chart_plot(figures),
+    }
+    return render(request, "prices/product_card.html", context)
