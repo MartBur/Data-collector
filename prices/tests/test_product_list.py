@@ -74,6 +74,16 @@ class ProductListTests(TestCase):
         self.assertLess(body.index("Super-Pharm"), body.index("Gemini"))
         self.assertLess(body.index("Gemini"), body.index("DOZ"))
 
+    def test_staff_product_name_opens_the_card_in_the_same_tab(self) -> None:
+        product = Product.objects.create(name="Citrus")
+        self._login(is_staff=True)
+        response = self.client.get(LIST_URL)
+        self.assertContains(
+            response,
+            f'<a href="/products/{product.pk}/">Citrus</a>',
+        )
+        self.assertNotContains(response, 'target="_blank"')
+
     def test_staff_get_empty_list_says_there_are_no_products(self) -> None:
         self._login(is_staff=True)
         response = self.client.get(LIST_URL)

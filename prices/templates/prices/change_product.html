@@ -5,6 +5,7 @@
   <title>Change product</title>
 </head>
 <body>
+  {% include "accounts/home_button.html" %}
   {% if too_many_shops %}
     <p>This product has more shops than this form can save.</p>
   {% elif confirm_pages %}

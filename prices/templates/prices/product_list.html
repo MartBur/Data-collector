@@ -5,6 +5,7 @@
   <title>Tracked products</title>
 </head>
 <body>
+  {% include "accounts/home_button.html" %}
   {% if kept_notice %}
     <p>A tracked product must keep one shop page.</p>
   {% endif %}
@@ -15,7 +16,7 @@
     <ul>
       {% for product in products %}
         <li>
-          <p>{{ product.name }}</p>
+          <p><a href="{% url 'prices:product_card' product.pk %}">{{ product.name }}</a></p>
           <p><a href="{% url 'prices:change_product' product.pk %}">Change</a></p>
           <form method="post" action="{% url 'prices:remove_product' product.pk %}">
             {% csrf_token %}

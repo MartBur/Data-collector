@@ -4,6 +4,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
+from prices.models import Product
+
 
 class SignInView(LoginView):
     template_name: str = "registration/login.html"
@@ -17,7 +19,21 @@ class SignInView(LoginView):
         return redirect_to
 
 
+def _home_product_key(product: Product) -> tuple[str, int]:
+    """Sort a tracked product by casefolded name, then pk."""
+    return (product.name.casefold(), int(product.pk))
+
+
+def _products_for_home() -> list[Product]:
+    """Return every tracked product for the signed-in home list."""
+    products = list(Product.objects.all())
+    products.sort(key=_home_product_key)
+    return products
+
+
 @never_cache
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
-    return render(request, "accounts/home.html")
+    """Show every tracked product by name, with no prices."""
+    context: dict[str, list[Product]] = {"products": _products_for_home()}
+    return render(request, "accounts/home.html", context)
