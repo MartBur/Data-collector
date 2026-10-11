@@ -44,7 +44,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | F-01 | calendar-day-landed-price   | (foundation) a tracked product can receive one landed shop price per calendar day, and "today" is only that day | —                | FR-008                                   | done |
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | done |
-| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | in-progress |
+| S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | done |
 | S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | ready |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | done |
 
@@ -121,7 +121,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** This is the north star. It is as early as sign-in, a tracked product, and a recorded price allow. Today's prices and the chart read Rossmann, DOZ, Super-Pharm, and Gemini.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-04: Favorites with today's lowest price
 
@@ -156,7 +156,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | F-01       | calendar-day-landed-price | Record one landed shop price per calendar day                     | yes                   | Run `/10x-plan calendar-day-landed-price`  | [#5](https://github.com/MartBur/Data-collector/issues/5) |
 | S-01       | account-sign-in           | Signed-in user can sign in                                        | yes                   | Implemented 2026-10-10                     | [#6](https://github.com/MartBur/Data-collector/issues/6) |
 | S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | yes                   | Implemented 2026-10-10                     | [#7](https://github.com/MartBur/Data-collector/issues/7) |
-| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | yes         | S-01, S-02, and F-01 are done. Shop set is named | [#8](https://github.com/MartBur/Data-collector/issues/8) |
+| S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | yes         | Implemented 2026-10-11 (`66695df`) | [#8](https://github.com/MartBur/Data-collector/issues/8) |
 | S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | yes                   | S-01, S-02, and F-01 are done              | [#9](https://github.com/MartBur/Data-collector/issues/9) |
 | S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | yes                   | Archived 2026-10-11                        | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 
@@ -190,3 +190,4 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 - **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Implemented 2026-10-10 (`6efae28`). Change folder: `context/changes/add-tracked-product/`. Lesson: —.
 - **S-02: user can add a tracked product together with the two or three shop pages that carry its price.** — Archived 2026-10-10 → `context/archive/2026-10-10-add-tracked-product/`. Lesson: —.
 - **S-05: user can change or remove a tracked product and its shop pages** — Archived 2026-10-11 → `context/archive/2026-10-10-edit-tracked-product/`. Lesson: —.
+- **S-03: user can open a watched product, compare today's landed shop prices, read a 30-day history with one line per shop, and follow a link to that product in that shop** — Implemented 2026-10-11 (`66695df`). Change folder: `context/changes/product-card-decision/`. Lesson: —.

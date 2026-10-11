@@ -68,6 +68,13 @@ class ProductCardTests(TestCase):
         """Return the x position of each date slot, oldest first."""
         return re.findall(r'data-slot="\d+" x1="([0-9.]+)"', html)
 
+    def _axis_prices(self, html: str) -> list[Decimal]:
+        """Return Y-axis tick prices from lowest to highest."""
+        return [
+            Decimal(value)
+            for value in re.findall(r'data-price="([0-9.]+)"', html)
+        ]
+
     def _lines(self, html: str) -> list[str]:
         """Return each shop line element, including its priced-day titles."""
         return re.findall(r"<polyline\b.*?</polyline>", html, flags=re.DOTALL)
@@ -312,3 +319,26 @@ class ProductCardTests(TestCase):
         self.assertNotIn('data-price="0.00"', html)
         self.assertNotIn('data-price="20.00"', html)
         self.assertIn('data-legend="Rossmann"', html)
+        prices = self._axis_prices(html)
+        self.assertEqual(prices[1] - prices[0], Decimal("5.00"))
+        self.assertLess(prices[1] - prices[0], Decimal("10.00"))
+
+    def test_y_axis_limits_ticks_for_an_extreme_price_range(self) -> None:
+        today = timezone.localdate()
+        product = self._product("Extreme axis shampoo")
+        page = self._page(
+            product,
+            Shop.ROSSMANN,
+            "https://www.rossmann.pl/p/extreme-axis",
+        )
+        self._observation(page, "1.00", today - timedelta(days=1))
+        self._observation(page, "99999999.99", today)
+        self._login()
+
+        response = self._open(product)
+
+        prices = self._axis_prices(response.content.decode())
+        self.assertLessEqual(len(prices), 21)
+        self.assertEqual(prices[0], Decimal("0.00"))
+        self.assertGreaterEqual(prices[-1], Decimal("99999999.99"))
+        self.assertEqual(prices[1] - prices[0], Decimal("5000000.00"))

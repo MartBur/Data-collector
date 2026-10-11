@@ -247,6 +247,10 @@ Give the card chart a Y axis and a shop legend, open each shop page in a new tab
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
 
+### Implementation review amendment — adaptive Y-axis ticks
+
+On 11 October 2026, implementation-review finding F1 replaced the fixed 10 PLN interval with an adaptive nice-number interval. The interval is at least 1 PLN, follows 1/2/5 times powers of ten, and permits at most 20 intervals. The axis-floor rule is unchanged.
+
 ---
 
 ## Testing Strategy
