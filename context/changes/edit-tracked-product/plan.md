@@ -330,34 +330,34 @@ No schema migration. Existing products stay. A product that already has one shop
 
 #### Automated
 
-- [x] 3.1 `uv run python manage.py test prices.tests.test_change_product` passes
-- [x] 3.2 Replacing a shop page URL with another URL for the same shop keeps that page's primary key and its price observations
-- [x] 3.3 Switching a shop that has prices writes nothing until confirm is posted, then deletes the old page's prices and leaves the new page with none
-- [x] 3.4 A rename that keeps the same shops and URLs saves with no confirm step and keeps every price observation
-- [x] 3.5 Clearing every shop row stores nothing
-- [x] 3.6 A one-page product can be renamed and saved, and switching its only shop is allowed when the new set still has one page
-- [x] 3.7 Change on a product with four shop pages writes nothing
-- [x] 3.8 Non-staff POST returns 403, and a successful change redirects to `/products/`
+- [x] 3.1 `uv run python manage.py test prices.tests.test_change_product` passes — 9fa035b
+- [x] 3.2 Replacing a shop page URL with another URL for the same shop keeps that page's primary key and its price observations — 9fa035b
+- [x] 3.3 Switching a shop that has prices writes nothing until confirm is posted, then deletes the old page's prices and leaves the new page with none — 9fa035b
+- [x] 3.4 A rename that keeps the same shops and URLs saves with no confirm step and keeps every price observation — 9fa035b
+- [x] 3.5 Clearing every shop row stores nothing — 9fa035b
+- [x] 3.6 A one-page product can be renamed and saved, and switching its only shop is allowed when the new set still has one page — 9fa035b
+- [x] 3.7 Change on a product with four shop pages writes nothing — 9fa035b
+- [x] 3.8 Non-staff POST returns 403, and a successful change redirects to `/products/` — 9fa035b
 
 #### Manual
 
-- [ ] 3.9 A staff user changes a same-shop URL, lands on the list, and that shop's recorded prices are still present
-- [ ] 3.10 A staff user switches a shop that has prices, sees the product name, the shop name, and "recorded prices will be deleted", and cancel leaves the stored pages unchanged
+- [x] 3.9 A staff user changes a same-shop URL, lands on the list, and that shop's recorded prices are still present — 9fa035b
+- [x] 3.10 A staff user switches a shop that has prices, sees the product name, the shop name, and "recorded prices will be deleted", and cancel leaves the stored pages unchanged — 9fa035b
 
 ### Phase 4: Remove a page or the product
 
 #### Automated
 
-- [ ] 4.1 `uv run python manage.py test prices.tests.test_remove_product` passes
-- [ ] 4.2 Removing one page from a three-page product deletes that page and its prices, leaves the other pages, and redirects to `/products/`
-- [ ] 4.3 Removing a page that has no prices skips confirm and deletes the page
-- [ ] 4.4 Removing a page that has prices writes nothing until confirm is posted, and the confirm page includes the product name, the shop name, and "recorded prices will be deleted"
-- [ ] 4.5 Removing the only page leaves the product and its prices unchanged, redirects to `/products/?kept=<pk>`, and the list shows "A tracked product must keep one shop page."
-- [ ] 4.6 Removing the whole product deletes the product, its pages, and their prices, after confirm when any of those pages has a price
-- [ ] 4.7 Non-staff POST returns 403, and a shop page that belongs to another product returns 404 and deletes nothing
+- [x] 4.1 `uv run python manage.py test prices.tests.test_remove_product` passes
+- [x] 4.2 Removing one page from a three-page product deletes that page and its prices, leaves the other pages, and redirects to `/products/`
+- [x] 4.3 Removing a page that has no prices skips confirm and deletes the page
+- [x] 4.4 Removing a page that has prices writes nothing until confirm is posted, and the confirm page includes the product name, the shop name, and "recorded prices will be deleted"
+- [x] 4.5 Removing the only page leaves the product and its prices unchanged, redirects to `/products/?kept=<pk>`, and the list shows "A tracked product must keep one shop page."
+- [x] 4.6 Removing the whole product deletes the product, its pages, and their prices, after confirm when any of those pages has a price
+- [x] 4.7 Non-staff POST returns 403, and a shop page that belongs to another product returns 404 and deletes nothing
 
 #### Manual
 
-- [ ] 4.8 A staff user removes one shop from a three-shop product and sees the other shops still on the list
-- [ ] 4.9 A staff user tries to remove the only shop and still sees that product with its page and the sentence "A tracked product must keep one shop page."
-- [ ] 4.10 A staff user removes a whole product and no longer sees it on the list
+- [x] 4.8 A staff user removes one shop from a three-shop product and sees the other shops still on the list
+- [x] 4.9 A staff user tries to remove the only shop and still sees that product with its page and the sentence "A tracked product must keep one shop page."
+- [x] 4.10 A staff user removes a whole product and no longer sees it on the list

@@ -27,7 +27,10 @@
       <input type="hidden" name="confirm" value="yes">
       <button type="submit">Confirm</button>
     </form>
-    <a href="{% url 'prices:product_list' %}">Cancel</a>
+    <form method="get" action="{% url 'prices:product_list' %}">
+      <input type="hidden" name="canceled" value="1">
+      <button type="submit">Cancel</button>
+    </form>
   {% else %}
     <form method="post" action="{% url 'prices:change_product' product.pk %}">
       {% csrf_token %}

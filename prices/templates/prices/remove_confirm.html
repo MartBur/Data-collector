@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Confirm removal</title>
+</head>
+<body>
+  <p>{{ product.name }}</p>
+  <ul>
+    {% for page in pages %}
+      <li>{{ page.get_shop_display }}</li>
+    {% endfor %}
+  </ul>
+  <p>recorded prices will be deleted</p>
+  <form method="post" action="{{ action }}">
+    {% csrf_token %}
+      <input type="hidden" name="confirm" value="yes">
+      <button type="submit">Confirm</button>
+    </form>
+    <form method="get" action="{% url 'prices:product_list' %}">
+      <input type="hidden" name="canceled" value="1">
+      <button type="submit">Cancel</button>
+    </form>
+</body>
+</html>
