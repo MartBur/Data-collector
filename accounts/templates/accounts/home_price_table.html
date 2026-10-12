@@ -1,0 +1,49 @@
+<table class="ascii-table">
+  <caption>{{ caption }}</caption>
+  <colgroup>
+    <col class="ascii-col-joint">
+    <col class="ascii-col-data">
+    <col class="ascii-col-joint">
+    <col class="ascii-col-data">
+    <col class="ascii-col-joint">
+  </colgroup>
+  {% include "accounts/ascii_rule.html" %}
+  <tr>
+    <td class="ascii-bar">|</td>
+    <td class="ascii-cell ascii-title" colspan="3">{{ caption }}</td>
+    <td class="ascii-bar">|</td>
+  </tr>
+  {% include "accounts/ascii_rule.html" %}
+  {% for row in rows %}
+    {% if with_shops and row.price.shops %}
+      {% for shop in row.price.shops %}
+        <tr>
+          <td class="ascii-bar">|</td>
+          <td class="ascii-cell"><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+          <td class="ascii-bar">|</td>
+          <td class="ascii-cell">{{ row.price.amount|stringformat:".2f" }} PLN at <a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>{% if row.price.day == "yesterday" %} yesterday{% endif %}</td>
+          <td class="ascii-bar">|</td>
+        </tr>
+        {% include "accounts/ascii_rule.html" %}
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td class="ascii-bar">|</td>
+        <td class="ascii-cell"><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+        <td class="ascii-bar">|</td>
+        <td class="ascii-cell">{% if with_shops or row.price.day == "none" %}No price{% elif row.price.day == "yesterday" %}{{ row.price.amount|stringformat:".2f" }} PLN yesterday{% else %}{{ row.price.amount|stringformat:".2f" }} PLN{% endif %}</td>
+        <td class="ascii-bar">|</td>
+      </tr>
+      {% include "accounts/ascii_rule.html" %}
+    {% endif %}
+  {% empty %}
+    <tr>
+      <td class="ascii-bar">|</td>
+      <td class="ascii-cell">_</td>
+      <td class="ascii-bar">|</td>
+      <td class="ascii-cell">_</td>
+      <td class="ascii-bar">|</td>
+    </tr>
+    {% include "accounts/ascii_rule.html" %}
+  {% endfor %}
+</table>

@@ -242,6 +242,7 @@ Replace `test_stored_price_does_not_appear_on_home`. A stored price for today is
 - Sign in and confirm the four tables sit in two rows of two, All products shows a name and an amount, and the name opens the card in this tab
 - On a product whose lowest price today is shared by two shops, confirm both shop names appear and each opens that shop page in a new tab
 - Confirm the line above the tables reads `Last price update: none - Warsaw time` before any recording command, and shows a Warsaw finish time after one completes
+- On a product whose price today equals its lowest stored price, confirm it appears in Historical lowest today with that price and shop
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
 
@@ -363,23 +364,24 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [ ] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices`
-- [ ] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock`
-- [ ] 1.3 The recording-run migration applies: `uv run python manage.py migrate`
-- [ ] 1.4 The project test suite passes: `uv run python manage.py test`
+- [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices` — 27c07e2
+- [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock` — 27c07e2
+- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2 — 27c07e2
+- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2 — 27c07e2
 
 ### Phase 2: Four-table start page
 
 #### Automated
 
-- [ ] 2.1 Home tests pass for name order, today's amount without a shop on All products, tied shop links on Lowest price today, yesterday labeled yesterday, No price for an older gap, historical membership, an empty Favourites table, the empty catalog, staff links, and the last-update line: `uv run python manage.py test accounts.tests.test_home`
-- [ ] 2.2 The project test suite passes: `uv run python manage.py test`
+- [x] 2.1 Home tests pass for name order, today's amount without a shop on All products, tied shop links on Lowest price today, yesterday labeled yesterday, No price for an older gap, historical membership, an empty Favourites table, the empty catalog, staff links, and the last-update line: `uv run python manage.py test accounts.tests.test_home` — 03cba21
+- [x] 2.2 The project test suite passes: `uv run python manage.py test` — 03cba21
 
 #### Manual
 
-- [ ] 2.3 Sign in and confirm the four tables sit in two rows of two, All products shows a name and an amount, and the name opens the card in this tab
-- [ ] 2.4 On a product whose lowest price today is shared by two shops, confirm both shop names appear and each opens that shop page in a new tab
-- [ ] 2.5 Confirm the line above the tables reads `Last price update: none - Warsaw time` before any recording command, and shows a Warsaw finish time after one completes
+- [x] 2.3 Sign in and confirm the four tables sit in two rows of two, All products shows a name and an amount, and the name opens the card in this tab
+- [x] 2.4 On a product whose lowest price today is shared by two shops, confirm both shop names appear and each opens that shop page in a new tab
+- [x] 2.5 Confirm the line above the tables reads `Last price update: none - Warsaw time` before any recording command, and shows a Warsaw finish time after one completes
+- [x] 2.6 On a product whose price today equals its lowest stored price, confirm it appears in Historical lowest today with that price and shop
 
 ### Phase 3: Per-user favourites
 

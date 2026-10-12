@@ -152,3 +152,10 @@ class PriceObservation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.shop_page} {self.amount} on {self.observed_date}"
+
+
+class PriceRecordingRun(models.Model):
+    finished_at: models.DateTimeField = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"finished at {self.finished_at}"
