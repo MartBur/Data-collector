@@ -25,9 +25,9 @@ Above those tables, one line reads `Last price update: 12.10.2026 08:00 - Warsaw
 
 All products and Favourites show the product name and an amount with no shop name. The name opens the product card in this tab. The amount is `19.99 PLN` when today has a price, `10.00 PLN yesterday` when only yesterday has one, and `No price` when neither day has one.
 
-Historical lowest today lists a product only when today's cheapest price equals the lowest daily price stored for that product on any date. The row names every shop tied for that price, in shop-page id order, joined by ` and `. Each shop name opens that shop's stored product URL in a new tab. Soap at `8.00 PLN` at Gemini, when `8.00` is the lowest price stored for soap, appears as `8.00 PLN at Gemini`. Shampoo at `19.99 PLN` today, with `15.00 PLN` stored last month, does not appear in this table.
+Historical lowest today lists a product only when today's cheapest price equals the lowest daily price stored for that product on any date. Each shop tied for that price is its own row, in shop-page id order. Each shop name opens that shop's stored product URL in a new tab. Soap at `8.00 PLN` at Gemini, when `8.00` is the lowest price stored for soap, appears as `8.00 PLN at Gemini`. Shampoo at `19.99 PLN` today, with `15.00 PLN` stored last month, does not appear in this table.
 
-Lowest price today lists every tracked product. Rossmann and DOZ both at `19.99 PLN` today, with Gemini at `24.00 PLN`, show `19.99 PLN at Rossmann and DOZ`, and both shop names are links. A product with only yesterday's `10.00 PLN` at Rossmann shows `10.00 PLN at Rossmann yesterday`. A product whose latest price is older than yesterday shows `No price`, and that older amount is not shown. The product name on these rows still opens the card in this tab.
+Lowest price today lists every tracked product. Rossmann and DOZ both at `19.99 PLN` today, with Gemini at `24.00 PLN`, show one row `19.99 PLN at Rossmann` and another row `19.99 PLN at DOZ`, and both shop names are links. A product with only yesterday's `10.00 PLN` at Rossmann shows `10.00 PLN at Rossmann yesterday`. A product whose latest price is older than yesterday shows `No price`, and that older amount is not shown. The product name on these rows still opens the card in this tab.
 
 Favourites lists the signed-in user's own products, with the same name and amount as All products. It starts empty. On the product card, `Add to favourites` and `Remove from favourites` change that user's list. Another account does not see those rows. A table with no rows keeps its caption and one empty row.
 
@@ -183,12 +183,14 @@ The update line is `Last price update: none - Warsaw time` when `latest_recordin
 #### 2. Home template
 
 **File**: `accounts/templates/accounts/home.html`
+**File**: `accounts/templates/accounts/home_price_table.html`
+**File**: `accounts/templates/accounts/ascii_rule.html`
 
 **Intent**: Show the 2×2 tables, the update line, and the existing account chrome.
 
 **Contract**: Keep the Home include, the username, the staff-only add and tracked-list links, and the sign-out form. The update line sits above the tables.
 
-The tables are in this order, each with a `<caption>` of exactly `All products`, `Favourites`, `Historical lowest today`, or `Lowest price today`. Visually they form two rows: All products beside Favourites, then Historical lowest today beside Lowest price today.
+The tables are in this order, each with a `<caption>` of exactly `All products`, `Favourites`, `Historical lowest today`, or `Lowest price today`. Visually they form two rows: All products beside Favourites, then Historical lowest today beside Lowest price today. Each table is an ASCII frame: `ascii_rule.html` draws the `+---+` rules, `home_price_table.html` repeats the caption in a title cell between `|` bars, and `home.html` places a `+` cross between the two rows.
 
 Each product row's name is a same-tab link to `prices:product_card`. On All products and Favourites the price text is:
 
@@ -198,15 +200,15 @@ Each product row's name is a same-tab link to `prices:product_card`. On All prod
 
 Those two tables do not show a shop label.
 
-On Historical lowest today and Lowest price today the price text is:
+On Historical lowest today and Lowest price today each tied shop is its own row. The price text on that row is:
 
-- `today`: `19.99 PLN at Rossmann and DOZ`
+- `today`: `19.99 PLN at Rossmann`, and the next row is `19.99 PLN at DOZ`
 - `yesterday`: `10.00 PLN at Rossmann yesterday` (Lowest price today only; the historical table has no yesterday rows)
 - `none`: `No price`
 
-Shop labels in that phrase are links to the stored shop URL with `target="_blank"` and `rel="noopener noreferrer"`. Labels are joined by ` and ` in the `shops` order. One shop is `19.99 PLN at Rossmann`, with no ` and `. Two decimals, matching the card's `.2f` format. The amount text is not itself a link.
+The shop label is a link to the stored shop URL with `target="_blank"` and `rel="noopener noreferrer"`. Rows follow `shops` order, and the product name link repeats on each of those rows. One shop is a single row, `19.99 PLN at Rossmann`. Two decimals, matching the card's `.2f` format. The amount text is not itself a link.
 
-A table with no products contains its caption and one row with a single empty cell, and no product link.
+A table with no products contains its caption and one row whose two data cells are `_`, and no product link.
 
 Replace `test_stored_price_does_not_appear_on_home`. A stored price for today is now visible on `/`.
 
@@ -220,12 +222,12 @@ Replace `test_stored_price_does_not_appear_on_home`. A stored price for today is
 
 - `apple` still renders before `Zebra`, and each name links to its card.
 - Rossmann `19.99` today: All products contains `19.99 PLN` and does not contain `Rossmann` in that table. Lowest price today contains `19.99 PLN at Rossmann`, and the Rossmann link has `target="_blank"` and `rel="noopener noreferrer"`.
-- Rossmann and DOZ `19.99` today, Gemini `24.00`, with Rossmann's page created first: Lowest price today contains `19.99 PLN at Rossmann and DOZ` and does not present Gemini as one of those tied shops. All products contains `19.99 PLN` without those shop labels in that table.
+- Rossmann and DOZ `19.99` today, Gemini `24.00`, with Rossmann's page created first: Lowest price today contains `19.99 PLN at Rossmann` and `19.99 PLN at DOZ` on separate rows, does not contain ` and `, and does not present Gemini as one of those tied shops. The product name link appears twice. All products contains `19.99 PLN` without those shop labels in that table.
 - No price today, Rossmann `10.00` yesterday: All products contains `10.00 PLN yesterday`. Lowest price today contains `10.00 PLN at Rossmann yesterday`. The historical table does not contain that product.
 - No price today or yesterday, and `8.00` three days ago: All products and Lowest price today contain `No price` for that product and do not contain `8.00`. The historical table does not contain that product.
 - `15.00` more than 30 days ago and `19.99` today: the product is in All products and Lowest price today, and not in Historical lowest today.
 - `8.00` today as the lowest stored daily price: Historical lowest today contains `8.00 PLN at Gemini`.
-- With products present, Favourites has its caption, one empty row, and no product link.
+- With products present, Favourites has its caption, one row whose data cells are `_`, and no product link.
 - With no products, all four captions are present, none of the four tables has a product link, and the username and sign-out form remain. Staff still see Add a tracked product and Tracked products.
 - No `PriceRecordingRun`: the page contains `Last price update: none - Warsaw time`.
 - A run finished at `2026-10-12 06:00 UTC`: the page contains `Last price update: 12.10.2026 08:00 - Warsaw time`.
@@ -439,9 +441,9 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Manual
 
-- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites — 0079680
-- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent — 0079680
-- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row — 0079680
+- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
+- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent
+- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
 
 ### Phase 4: Staff price updates
 
