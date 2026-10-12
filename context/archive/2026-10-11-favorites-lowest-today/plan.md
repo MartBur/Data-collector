@@ -426,10 +426,10 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Manual
 
-- [x] 2.3 Sign in and confirm the four tables sit in two rows of two, All products shows a name and an amount, and the name opens the card in this tab
-- [x] 2.4 On a product whose lowest price today is shared by two shops, confirm both shop names appear and each opens that shop page in a new tab
-- [x] 2.5 Confirm the line above the tables reads `Last price update: none - Warsaw time` before any recording command, and shows a Warsaw finish time after one completes
-- [x] 2.6 On a product whose price today equals its lowest stored price, confirm it appears in Historical lowest today with that price and shop
+- [x] 2.3 Sign in and confirm the four tables sit in two rows of two, All products shows a name and an amount, and the name opens the card in this tab — e06d993
+- [x] 2.4 On a product whose lowest price today is shared by two shops, confirm both shop names appear and each opens that shop page in a new tab — e06d993
+- [x] 2.5 Confirm the line above the tables reads `Last price update: none - Warsaw time` before any recording command, and shows a Warsaw finish time after one completes — e06d993
+- [x] 2.6 On a product whose price today equals its lowest stored price, confirm it appears in Historical lowest today with that price and shop — e06d993
 
 ### Phase 3: Per-user favourites
 
@@ -441,21 +441,21 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Manual
 
-- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
-- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent
-- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
+- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites — 0079680
+- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent — 0079680
+- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row — 0079680
 
 ### Phase 4: Staff price updates
 
 #### Automated
 
-- [x] 4.1 Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home`
-- [x] 4.2 The project test suite passes: `uv run python manage.py test`
-- [x] 4.6 Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates`
+- [x] 4.1 Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home` — 33a90ae
+- [x] 4.2 The project test suite passes: `uv run python manage.py test` — 33a90ae
+- [x] 4.6 Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates` — 33a90ae
 
 #### Manual
 
-- [x] 4.3 As staff, open Price updates from the home page and confirm the all-shop button and one button per shop
-- [x] 4.4 Click all shop update and confirm Last price update shows a Warsaw finish time
-- [x] 4.5 Sign in as a non-staff user and confirm Price updates is absent
-- [x] 4.7 Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########`
+- [x] 4.3 As staff, open Price updates from the home page and confirm the all-shop button and one button per shop — 33a90ae
+- [x] 4.4 Click all shop update and confirm Last price update shows a Warsaw finish time — 33a90ae
+- [x] 4.5 Sign in as a non-staff user and confirm Price updates is absent — 33a90ae
+- [x] 4.7 Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########` — 33a90ae
