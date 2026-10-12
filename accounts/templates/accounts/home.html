@@ -95,6 +95,10 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .ascii-title {
+      font-weight: 700;
+      text-align: center;
+    }
     .last-price-update {
       font-weight: 700;
     }
@@ -106,6 +110,7 @@
   {% if user.is_staff %}
     <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>
     <p><a href="{% url 'prices:product_list' %}">Tracked products</a></p>
+    <p><a href="{% url 'prices:price_updates' %}">Price updates</a></p>
   {% endif %}
   <p class="last-price-update"><strong>{{ last_price_update }}</strong></p>
   <div class="home-tables">

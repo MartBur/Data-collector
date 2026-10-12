@@ -7,6 +7,10 @@
 <body>
   {% include "accounts/home_button.html" %}
   <p>{{ product.name }}</p>
+  <form method="post" action="{% url 'prices:toggle_favourite' product.pk %}">
+    {% csrf_token %}
+    <button type="submit">{% if is_favourite %}Remove from favourites{% else %}Add to favourites{% endif %}</button>
+  </form>
   <ul>
     {% for shop in figures.shops %}
       <li>

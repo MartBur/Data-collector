@@ -25,9 +25,9 @@ Above those tables, one line reads `Last price update: 12.10.2026 08:00 - Warsaw
 
 All products and Favourites show the product name and an amount with no shop name. The name opens the product card in this tab. The amount is `19.99 PLN` when today has a price, `10.00 PLN yesterday` when only yesterday has one, and `No price` when neither day has one.
 
-Historical lowest today lists a product only when today's cheapest price equals the lowest daily price stored for that product on any date. The row names every shop tied for that price, in shop-page id order, joined by ` and `. Each shop name opens that shop's stored product URL in a new tab. Soap at `8.00 PLN` at Gemini, when `8.00` is the lowest price stored for soap, appears as `8.00 PLN at Gemini`. Shampoo at `19.99 PLN` today, with `15.00 PLN` stored last month, does not appear in this table.
+Historical lowest today lists a product only when today's cheapest price equals the lowest daily price stored for that product on any date. Each shop tied for that price is its own row, in shop-page id order. Each shop name opens that shop's stored product URL in a new tab. Soap at `8.00 PLN` at Gemini, when `8.00` is the lowest price stored for soap, appears as `8.00 PLN at Gemini`. Shampoo at `19.99 PLN` today, with `15.00 PLN` stored last month, does not appear in this table.
 
-Lowest price today lists every tracked product. Rossmann and DOZ both at `19.99 PLN` today, with Gemini at `24.00 PLN`, show `19.99 PLN at Rossmann and DOZ`, and both shop names are links. A product with only yesterday's `10.00 PLN` at Rossmann shows `10.00 PLN at Rossmann yesterday`. A product whose latest price is older than yesterday shows `No price`, and that older amount is not shown. The product name on these rows still opens the card in this tab.
+Lowest price today lists every tracked product. Rossmann and DOZ both at `19.99 PLN` today, with Gemini at `24.00 PLN`, show one row `19.99 PLN at Rossmann` and another row `19.99 PLN at DOZ`, and both shop names are links. A product with only yesterday's `10.00 PLN` at Rossmann shows `10.00 PLN at Rossmann yesterday`. A product whose latest price is older than yesterday shows `No price`, and that older amount is not shown. The product name on these rows still opens the card in this tab.
 
 Favourites lists the signed-in user's own products, with the same name and amount as All products. It starts empty. On the product card, `Add to favourites` and `Remove from favourites` change that user's list. Another account does not see those rows. A table with no rows keeps its caption and one empty row.
 
@@ -183,12 +183,14 @@ The update line is `Last price update: none - Warsaw time` when `latest_recordin
 #### 2. Home template
 
 **File**: `accounts/templates/accounts/home.html`
+**File**: `accounts/templates/accounts/home_price_table.html`
+**File**: `accounts/templates/accounts/ascii_rule.html`
 
 **Intent**: Show the 2×2 tables, the update line, and the existing account chrome.
 
 **Contract**: Keep the Home include, the username, the staff-only add and tracked-list links, and the sign-out form. The update line sits above the tables.
 
-The tables are in this order, each with a `<caption>` of exactly `All products`, `Favourites`, `Historical lowest today`, or `Lowest price today`. Visually they form two rows: All products beside Favourites, then Historical lowest today beside Lowest price today.
+The tables are in this order, each with a `<caption>` of exactly `All products`, `Favourites`, `Historical lowest today`, or `Lowest price today`. Visually they form two rows: All products beside Favourites, then Historical lowest today beside Lowest price today. Each table is an ASCII frame: `ascii_rule.html` draws the `+---+` rules, `home_price_table.html` repeats the caption in a title cell between `|` bars, and `home.html` places a `+` cross between the two rows.
 
 Each product row's name is a same-tab link to `prices:product_card`. On All products and Favourites the price text is:
 
@@ -198,15 +200,15 @@ Each product row's name is a same-tab link to `prices:product_card`. On All prod
 
 Those two tables do not show a shop label.
 
-On Historical lowest today and Lowest price today the price text is:
+On Historical lowest today and Lowest price today each tied shop is its own row. The price text on that row is:
 
-- `today`: `19.99 PLN at Rossmann and DOZ`
+- `today`: `19.99 PLN at Rossmann`, and the next row is `19.99 PLN at DOZ`
 - `yesterday`: `10.00 PLN at Rossmann yesterday` (Lowest price today only; the historical table has no yesterday rows)
 - `none`: `No price`
 
-Shop labels in that phrase are links to the stored shop URL with `target="_blank"` and `rel="noopener noreferrer"`. Labels are joined by ` and ` in the `shops` order. One shop is `19.99 PLN at Rossmann`, with no ` and `. Two decimals, matching the card's `.2f` format. The amount text is not itself a link.
+The shop label is a link to the stored shop URL with `target="_blank"` and `rel="noopener noreferrer"`. Rows follow `shops` order, and the product name link repeats on each of those rows. One shop is a single row, `19.99 PLN at Rossmann`. Two decimals, matching the card's `.2f` format. The amount text is not itself a link.
 
-A table with no products contains its caption and one row with a single empty cell, and no product link.
+A table with no products contains its caption and one row whose two data cells are `_`, and no product link.
 
 Replace `test_stored_price_does_not_appear_on_home`. A stored price for today is now visible on `/`.
 
@@ -220,12 +222,12 @@ Replace `test_stored_price_does_not_appear_on_home`. A stored price for today is
 
 - `apple` still renders before `Zebra`, and each name links to its card.
 - Rossmann `19.99` today: All products contains `19.99 PLN` and does not contain `Rossmann` in that table. Lowest price today contains `19.99 PLN at Rossmann`, and the Rossmann link has `target="_blank"` and `rel="noopener noreferrer"`.
-- Rossmann and DOZ `19.99` today, Gemini `24.00`, with Rossmann's page created first: Lowest price today contains `19.99 PLN at Rossmann and DOZ` and does not present Gemini as one of those tied shops. All products contains `19.99 PLN` without those shop labels in that table.
+- Rossmann and DOZ `19.99` today, Gemini `24.00`, with Rossmann's page created first: Lowest price today contains `19.99 PLN at Rossmann` and `19.99 PLN at DOZ` on separate rows, does not contain ` and `, and does not present Gemini as one of those tied shops. The product name link appears twice. All products contains `19.99 PLN` without those shop labels in that table.
 - No price today, Rossmann `10.00` yesterday: All products contains `10.00 PLN yesterday`. Lowest price today contains `10.00 PLN at Rossmann yesterday`. The historical table does not contain that product.
 - No price today or yesterday, and `8.00` three days ago: All products and Lowest price today contain `No price` for that product and do not contain `8.00`. The historical table does not contain that product.
 - `15.00` more than 30 days ago and `19.99` today: the product is in All products and Lowest price today, and not in Historical lowest today.
 - `8.00` today as the lowest stored daily price: Historical lowest today contains `8.00 PLN at Gemini`.
-- With products present, Favourites has its caption, one empty row, and no product link.
+- With products present, Favourites has its caption, one row whose data cells are `_`, and no product link.
 - With no products, all four captions are present, none of the four tables has a product link, and the username and sign-out form remain. Staff still see Add a tracked product and Tracked products.
 - No `PriceRecordingRun`: the page contains `Last price update: none - Warsaw time`.
 - A run finished at `2026-10-12 06:00 UTC`: the page contains `Last price update: 12.10.2026 08:00 - Warsaw time`.
@@ -319,6 +321,50 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 
 ---
 
+## Phase 4: Staff price updates
+
+### Overview
+
+A staff user opens Price updates and runs the same recording the management commands use: every shop, or one shop. The finish time updates Last price update. The page works locally and on Render because it calls the recording function inside the web app.
+
+### Changes Required:
+
+#### 1. Shared recording run
+
+**File**: `prices/management/recording_command.py`
+
+**Intent**: The terminal commands and the staff page share one finish path.
+
+**Contract**: `run_price_recording(shop_code, write)` records every tracked page when `shop_code` is `None`, or only that shop. It yields a ten-character progress bar after each page. After the pages return, it stamps the recording clock. A raise before that stamp leaves the previous finish time in place.
+
+#### 2. Staff page
+
+**File**: `prices/urls.py`
+**File**: `prices/views.py`
+**File**: `prices/templates/prices/price_updates.html`
+**File**: `accounts/templates/accounts/home.html`
+
+**Intent**: Only staff can start a recording from the site.
+
+**Contract**: Home shows `Price updates` for staff only, linking to `prices:price_updates` at `products/price-updates/`. The page shows `all shop update` and one button per shop: `Rossmann update`, `DOZ update`, `Super-Pharm update`, `Gemini update`. Each button POSTs and streams a ten-character bar. It starts as `----------`. Each `#` is another 10 percent of the pages in that run, and any remainder rounds up to the next hash. A non-staff user is denied. An anonymous POST redirects to sign-in. An unknown shop does not record. After a finished run the page shows the Warsaw last-update line.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home`
+- Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates`
+- The project test suite passes: `uv run python manage.py test`
+
+#### Manual Verification:
+
+- As staff, open Price updates from the home page and confirm the all-shop button and one button per shop
+- Click all shop update and confirm Last price update shows a Warsaw finish time
+- Sign in as a non-staff user and confirm Price updates is absent
+- Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########`
+
+---
+
 ## Testing Strategy
 
 ### Unit Tests:
@@ -330,6 +376,7 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 
 - `accounts/tests/test_home.py` owns the four captions, phrases, links, empty rows, staff links, and the update line. Page tests build observations relative to `timezone.localdate()`.
 - `prices/tests/test_favourite.py` owns the card POST, the button label, anonymous redirect, and cascade on product delete.
+- `prices/tests/test_price_updates.py` owns the staff recording buttons, a single-shop run, and rejection of an unknown shop.
 
 ### Manual Testing Steps:
 
@@ -338,6 +385,7 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 3. Use a product with no price today and a price yesterday. Confirm the yesterday label, and that a price from three days ago alone shows `No price`.
 4. Run a recording command and confirm the line shows its Warsaw finish time to the minute. Before any run, confirm the none line.
 5. Add and remove a favourite from the card with two different users.
+6. As staff, run a price update and confirm the bar changes from `----------` to `##########`.
 
 ## Performance Considerations
 
@@ -366,8 +414,8 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 - [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices` — 27c07e2
 - [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock` — 27c07e2
-- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2 — 27c07e2
-- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2 — 27c07e2
+- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2
+- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2
 
 ### Phase 2: Four-table start page
 
@@ -387,12 +435,27 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [ ] 3.1 The favourite migration applies: `uv run python manage.py migrate`
-- [ ] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home`
-- [ ] 3.3 The project test suite passes: `uv run python manage.py test`
+- [x] 3.1 The favourite migration applies: `uv run python manage.py migrate` — 0079680
+- [x] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home` — 0079680
+- [x] 3.3 The project test suite passes: `uv run python manage.py test` — 0079680
 
 #### Manual
 
-- [ ] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
-- [ ] 3.5 Sign in as a second user and confirm the first user's favourites are absent
-- [ ] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
+- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
+- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent
+- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
+
+### Phase 4: Staff price updates
+
+#### Automated
+
+- [x] 4.1 Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home`
+- [x] 4.2 The project test suite passes: `uv run python manage.py test`
+- [x] 4.6 Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates`
+
+#### Manual
+
+- [x] 4.3 As staff, open Price updates from the home page and confirm the all-shop button and one button per shop
+- [x] 4.4 Click all shop update and confirm Last price update shows a Warsaw finish time
+- [x] 4.5 Sign in as a non-staff user and confirm Price updates is absent
+- [x] 4.7 Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########`

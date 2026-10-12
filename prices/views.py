@@ -1,20 +1,97 @@
+import json
+from collections.abc import Iterator
 from decimal import ROUND_CEILING, Decimal
 from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AbstractBaseUser
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Prefetch
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from accounts.views import _last_price_update_line
 from prices.card import CardFigures, card_figures
 from prices.forms import AddProductForm, ChangeProductForm
-from prices.models import PriceObservation, Product, ShopPage
+from prices.management.recording_command import iter_price_recording
+from prices.models import Favourite, PriceObservation, Product, Shop, ShopPage
 
 _MAX_ADDED_PK: int = 2**63 - 1
+_ALL_SHOPS: str = "all"
+
+
+class PriceUpdateShop(TypedDict):
+    code: str
+    label: str
+
+
+class PriceUpdatesPage(TypedDict):
+    shops: list[PriceUpdateShop]
+    last_price_update: str
+
+
+def _discard_recording_line(line: str) -> None:
+    """Ignore a recording progress line. The page reads the finish clock."""
+    return None
+
+
+def _price_update_shops() -> list[PriceUpdateShop]:
+    """Return each shop code and the button label staff see."""
+    return [
+        {"code": code, "label": f"{label} update"}
+        for code, label in Shop.choices
+    ]
+
+
+def _bar_script(function_name: str, text: str) -> str:
+    """Return a script that updates one progress element, plus padding to flush."""
+    payload = json.dumps(text)
+    return f"<script>{function_name}({payload});</script>\n" + (" " * 2048)
+
+
+def _price_update_stream(request: HttpRequest, shop_code: str | None) -> Iterator[bytes]:
+    """Yield the page, then each progress bar, then the finished update line."""
+    context: PriceUpdatesPage = {
+        "shops": _price_update_shops(),
+        "last_price_update": _last_price_update_line(),
+    }
+    opening = render_to_string("prices/price_updates.html", context, request=request)
+    yield opening.encode()
+    yield _bar_script("showBar", "----------").encode()
+    for bar in iter_price_recording(shop_code, _discard_recording_line):
+        yield _bar_script("showBar", bar).encode()
+    yield _bar_script("showUpdate", _last_price_update_line()).encode()
+
+
+@login_required
+def price_updates(request: HttpRequest) -> HttpResponse:
+    """Show staff the recording buttons, or stream one recording's progress bar."""
+    if not request.user.is_staff:
+        raise PermissionDenied
+    if request.method == "POST":
+        shop = request.POST.get("shop")
+        if shop == _ALL_SHOPS:
+            shop_code: str | None = None
+        elif shop in Shop.values:
+            shop_code = shop
+        else:
+            return HttpResponseBadRequest("Unknown shop.")
+        response = StreamingHttpResponse(
+            _price_update_stream(request, shop_code),
+            content_type="text/html; charset=utf-8",
+        )
+        response["Cache-Control"] = "no-cache"
+        response["X-Accel-Buffering"] = "no"
+        return response
+    context: PriceUpdatesPage = {
+        "shops": _price_update_shops(),
+        "last_price_update": _last_price_update_line(),
+    }
+    return render(request, "prices/price_updates.html", context)
 
 
 class AddProductPage(TypedDict):
@@ -354,6 +431,7 @@ class ProductCardPage(TypedDict):
     product: Product
     figures: CardFigures
     chart: ChartPlot
+    is_favourite: bool
 
 
 def _two_decimals(value: Decimal) -> str:
@@ -529,6 +607,28 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
     }
 
 
+def _is_favourite(user: AbstractBaseUser, product: Product) -> bool:
+    """Return True when this signed-in user has marked the product."""
+    return Favourite.objects.filter(user=user, product=product).exists()
+
+
+@login_required
+@require_POST
+def toggle_favourite(request: HttpRequest, pk: int) -> HttpResponse:
+    """Add this user's favourite, or remove it when it already exists.
+
+    The signed-in user is the only account this post can change.
+    A missing product is not found. GET does not write.
+    """
+    product = get_object_or_404(Product, pk=pk)
+    favourite = Favourite.objects.filter(user=request.user, product=product).first()
+    if favourite is None:
+        Favourite.objects.create(user=request.user, product=product)
+    else:
+        favourite.delete()
+    return redirect("prices:product_card", pk=product.pk)
+
+
 @login_required
 def product_card(request: HttpRequest, pk: int) -> HttpResponse:
     """Show one tracked product's shop prices and 30-day chart."""
@@ -538,5 +638,6 @@ def product_card(request: HttpRequest, pk: int) -> HttpResponse:
         "product": product,
         "figures": figures,
         "chart": _chart_plot(figures),
+        "is_favourite": _is_favourite(request.user, product),
     }
     return render(request, "prices/product_card.html", context)

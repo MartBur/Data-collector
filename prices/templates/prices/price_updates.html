@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Price updates</title>
+  <style>
+    body {
+      background: #ffffff;
+      color: #111111;
+    }
+    p#last-price-update { font-weight: 700; }
+    pre#recording-bar {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1.25rem;
+      letter-spacing: 0.15em;
+    }
+  </style>
+</head>
+<body>
+  {% include "accounts/home_button.html" %}
+  <h1>Price updates</h1>
+  <p id="last-price-update">{{ last_price_update }}</p>
+  <pre id="recording-bar">----------</pre>
+  <script>
+    function showBar(text) {
+      var node = document.getElementById("recording-bar");
+      if (node) node.textContent = text;
+    }
+    function showUpdate(text) {
+      var node = document.getElementById("last-price-update");
+      if (node) node.textContent = text;
+    }
+  </script>
+  <form method="post" action="{% url 'prices:price_updates' %}">
+    {% csrf_token %}
+    <button type="submit" name="shop" value="all">all shop update</button>
+  </form>
+  {% for shop in shops %}
+    <form method="post" action="{% url 'prices:price_updates' %}">
+      {% csrf_token %}
+      <button type="submit" name="shop" value="{{ shop.code }}">{{ shop.label }}</button>
+    </form>
+  {% endfor %}
+</body>
+</html>
