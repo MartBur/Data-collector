@@ -45,7 +45,7 @@ When a product runs out, the user has to buy the same day, hunts across several 
 | S-01 | account-sign-in             | sign in                                                                                                       | —                | FR-001                                   | done |
 | S-02 | add-tracked-product         | add a tracked product together with its two or three shop pages                                               | S-01             | FR-012                                   | done |
 | S-03 | product-card-decision       | open a product, compare today's landed shop prices, read a 30-day chart, and open the shop                    | S-01, S-02, F-01 | US-01, FR-003, FR-004, FR-005, FR-006    | done |
-| S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | in-progress |
+| S-04 | favorites-lowest-today      | see favorite products, each with the lowest price recorded for that day                                      | S-01, S-02, F-01 | US-01, FR-002                            | done |
 | S-05 | edit-tracked-product        | change or remove a tracked product and its shop pages                                                         | S-02             | FR-013                                   | done |
 
 ## Streams
@@ -135,7 +135,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Are the list owner's tracked products the preloaded favorites for that account? — Owner: user. Block: no.
   - Which timezone bounds the calendar day for "today"? — Owner: user. Block: no.
 - **Risk:** Same data prerequisites as the card, sequenced just after it so the decision screen is not delayed by the list. The shop names do not block this slice; it shows one number for the day, not each shop page.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-05: Change or remove a tracked product
 
@@ -157,7 +157,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-01       | account-sign-in           | Signed-in user can sign in                                        | yes                   | Implemented 2026-10-10                     | [#6](https://github.com/MartBur/Data-collector/issues/6) |
 | S-02       | add-tracked-product       | List owner can add a product with its shop pages                  | yes                   | Implemented 2026-10-10                     | [#7](https://github.com/MartBur/Data-collector/issues/7) |
 | S-03       | product-card-decision     | Open a product, compare today's prices and 30-day history, go to the shop | yes         | Implemented 2026-10-11 (`66695df`) | [#8](https://github.com/MartBur/Data-collector/issues/8) |
-| S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | yes                   | S-01, S-02, and F-01 are done              | [#9](https://github.com/MartBur/Data-collector/issues/9) |
+| S-04       | favorites-lowest-today    | Start page shows each favorite's lowest price for that day        | yes                   | Implemented 2026-10-12 (`f9c1b7f`)         | [#9](https://github.com/MartBur/Data-collector/issues/9) |
 | S-05       | edit-tracked-product      | List owner can change or remove a tracked product                 | yes                   | Archived 2026-10-11                        | [#10](https://github.com/MartBur/Data-collector/issues/10) |
 
 ## Open Roadmap Questions
@@ -192,3 +192,5 @@ Settled 2026-09-23: the fixed shop set is Rossmann (https://www.rossmann.pl/), D
 - **S-05: user can change or remove a tracked product and its shop pages** — Archived 2026-10-11 → `context/archive/2026-10-10-edit-tracked-product/`. Lesson: —.
 - **S-03: user can open a watched product, compare today's landed shop prices, read a 30-day history with one line per shop, and follow a link to that product in that shop** — Implemented 2026-10-11 (`66695df`). Change folder: `context/changes/product-card-decision/`. Lesson: —.
 - **S-03: user can open a watched product, compare today's landed shop prices, read a 30-day history with one line per shop, and follow a link to that product in that shop** — Archived 2026-10-11 → `context/archive/2026-10-10-product-card-decision/`. Lesson: —.
+- **S-04: user can see their favorite products, each with the lowest price recorded for that day** — Implemented 2026-10-12 (`f9c1b7f`). Change folder: `context/changes/favorites-lowest-today/`. Lesson: —.
+- **S-04: user can see their favorite products, each with the lowest price recorded for that day** — Archived 2026-10-12 → `context/archive/2026-10-11-favorites-lowest-today/`. Lesson: —.
