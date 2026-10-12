@@ -363,17 +363,17 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices`
-- [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock`
-- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate`
-- [x] 1.4 The project test suite passes: `uv run python manage.py test`
+- [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices` — 27c07e2
+- [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock` — 27c07e2
+- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2 — 27c07e2
+- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2 — 27c07e2
 
 ### Phase 2: Four-table start page
 
 #### Automated
 
-- [ ] 2.1 Home tests pass for name order, today's amount without a shop on All products, tied shop links on Lowest price today, yesterday labeled yesterday, No price for an older gap, historical membership, an empty Favourites table, the empty catalog, staff links, and the last-update line: `uv run python manage.py test accounts.tests.test_home`
-- [ ] 2.2 The project test suite passes: `uv run python manage.py test`
+- [x] 2.1 Home tests pass for name order, today's amount without a shop on All products, tied shop links on Lowest price today, yesterday labeled yesterday, No price for an older gap, historical membership, an empty Favourites table, the empty catalog, staff links, and the last-update line: `uv run python manage.py test accounts.tests.test_home`
+- [x] 2.2 The project test suite passes: `uv run python manage.py test`
 
 #### Manual
 

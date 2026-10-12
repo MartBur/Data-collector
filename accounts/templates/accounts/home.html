@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>Signed in</title>
+  <style>
+    .home-tables {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 2rem;
+      align-items: start;
+    }
+    .home-tables table {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
   {% include "accounts/home_button.html" %}
@@ -11,13 +22,61 @@
     <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>
     <p><a href="{% url 'prices:product_list' %}">Tracked products</a></p>
   {% endif %}
-  {% if products %}
-    <ul>
-      {% for product in products %}
-        <li><a href="{% url 'prices:product_card' product.pk %}">{{ product.name }}</a></li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  <p>{{ last_price_update }}</p>
+  <div class="home-tables">
+    <table>
+      <caption>All products</caption>
+      {% if all_products %}
+        {% for row in all_products %}
+          <tr>
+            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+            <td>{% if row.price.day == "none" %}No price{% elif row.price.day == "yesterday" %}{{ row.price.amount|stringformat:".2f" }} PLN yesterday{% else %}{{ row.price.amount|stringformat:".2f" }} PLN{% endif %}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td></td></tr>
+      {% endif %}
+    </table>
+    <table>
+      <caption>Favourites</caption>
+      {% if favourites %}
+        {% for row in favourites %}
+          <tr>
+            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+            <td>{% if row.price.day == "none" %}No price{% elif row.price.day == "yesterday" %}{{ row.price.amount|stringformat:".2f" }} PLN yesterday{% else %}{{ row.price.amount|stringformat:".2f" }} PLN{% endif %}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td></td></tr>
+      {% endif %}
+    </table>
+    <table>
+      <caption>Historical lowest today</caption>
+      {% if historical_lowest_today %}
+        {% for row in historical_lowest_today %}
+          <tr>
+            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+            <td>{% if row.price.day == "none" %}No price{% else %}{{ row.price.amount|stringformat:".2f" }} PLN at {% for shop in row.price.shops %}{% if not forloop.first %} and {% endif %}<a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>{% endfor %}{% if row.price.day == "yesterday" %} yesterday{% endif %}{% endif %}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td></td></tr>
+      {% endif %}
+    </table>
+    <table>
+      <caption>Lowest price today</caption>
+      {% if lowest_price_today %}
+        {% for row in lowest_price_today %}
+          <tr>
+            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
+            <td>{% if row.price.day == "none" %}No price{% else %}{{ row.price.amount|stringformat:".2f" }} PLN at {% for shop in row.price.shops %}{% if not forloop.first %} and {% endif %}<a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>{% endfor %}{% if row.price.day == "yesterday" %} yesterday{% endif %}{% endif %}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td></td></tr>
+      {% endif %}
+    </table>
+  </div>
   <form method="post" action="{% url 'accounts:logout' %}">
     {% csrf_token %}
     <button type="submit">Sign out</button>
