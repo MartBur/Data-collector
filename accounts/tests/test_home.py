@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 from django.test import TestCase
 from django.utils import timezone
 
-from prices.models import PriceObservation, Product, Shop, ShopPage
+from prices.models import Favourite, PriceObservation, Product, Shop, ShopPage
 from prices.recording_clock import mark_recording_finished
 
 PASSWORD: str = "correct-horse"
@@ -327,6 +327,102 @@ class HomeTests(TestCase):
         self.assertIn(
             f'href="/products/{product.pk}/">Alpecin</a>',
             _slice_table(body, "All products"),
+        )
+
+    def test_favourites_use_the_same_amount_phrase_as_all_products(self) -> None:
+        today = timezone.localdate()
+        today_product = Product.objects.create(name="Alpecin")
+        yesterday_product = Product.objects.create(name="Dawn")
+        none_product = Product.objects.create(name="Gap")
+        today_page = self._page(
+            today_product,
+            Shop.ROSSMANN,
+            "https://www.rossmann.pl/p/alpecin",
+        )
+        yesterday_page = self._page(
+            yesterday_product,
+            Shop.DOZ,
+            "https://www.doz.pl/p/dawn",
+        )
+        none_page = self._page(
+            none_product,
+            Shop.GEMINI,
+            "https://gemini.pl/p/gap",
+        )
+        self._observation(today_page, "19.99", today)
+        self._observation(yesterday_page, "10.00", today - timedelta(days=1))
+        self._observation(none_page, "8.00", today - timedelta(days=3))
+        user = self._login()
+        Favourite.objects.create(user=user, product=today_product)
+        Favourite.objects.create(user=user, product=yesterday_product)
+        Favourite.objects.create(user=user, product=none_product)
+
+        body = self._home_body()
+        all_products = _slice_table(body, "All products")
+        favourites = _slice_table(body, "Favourites")
+        today_link = f'href="/products/{today_product.pk}/">Alpecin</a>'
+        yesterday_link = f'href="/products/{yesterday_product.pk}/">Dawn</a>'
+        none_link = f'href="/products/{none_product.pk}/">Gap</a>'
+
+        for link in (today_link, yesterday_link, none_link):
+            self.assertIn(link, favourites)
+            self.assertIn(link, all_products)
+        self.assertLess(favourites.index(today_link), favourites.index(yesterday_link))
+        self.assertLess(favourites.index(yesterday_link), favourites.index(none_link))
+        self.assertNotIn('target="_blank"', favourites)
+        self.assertIn("19.99 PLN", favourites)
+        self.assertIn("19.99 PLN", all_products)
+        self.assertNotIn("19.99 PLN yesterday", favourites)
+        self.assertIn("10.00 PLN yesterday", favourites)
+        self.assertIn("10.00 PLN yesterday", all_products)
+        self.assertIn("No price", favourites)
+        self.assertIn("No price", all_products)
+        self.assertNotIn("Rossmann", favourites)
+        self.assertNotIn("DOZ", favourites)
+        self.assertNotIn("Gemini", favourites)
+        self.assertNotIn("8.00", favourites)
+        self.assertNotIn("8.00", all_products)
+
+    def test_favourites_follow_casefold_order(self) -> None:
+        later = Product.objects.create(name="Zebra")
+        earlier = Product.objects.create(name="apple")
+        self.assertLess(later.pk, earlier.pk)
+        self.assertLess(earlier.name.casefold(), later.name.casefold())
+        user = self._login()
+        Favourite.objects.create(user=user, product=later)
+        Favourite.objects.create(user=user, product=earlier)
+
+        body = self._home_body()
+        favourites = _slice_table(body, "Favourites")
+        all_products = _slice_table(body, "All products")
+        earlier_link = f'href="/products/{earlier.pk}/">apple'
+        later_link = f'href="/products/{later.pk}/">Zebra'
+
+        self.assertLess(favourites.index(earlier_link), favourites.index(later_link))
+        self.assertLess(all_products.index(earlier_link), all_products.index(later_link))
+
+    def test_another_user_does_not_see_favourites(self) -> None:
+        product = Product.objects.create(name="Alpecin")
+        owner = self._user("ada")
+        Favourite.objects.create(user=owner, product=product)
+        other = self._user("bea")
+        self.client.force_login(other)
+
+        body = self._home_body()
+        favourites = _slice_table(body, "Favourites")
+        all_products = _slice_table(body, "All products")
+
+        self.assertIn("<caption>Favourites</caption>", favourites)
+        self.assertIn(
+            '<td class="ascii-cell ascii-title" colspan="3">Favourites</td>',
+            favourites,
+        )
+        self.assertIn("<td class=\"ascii-cell\">_</td>", favourites)
+        self.assertNotIn("Alpecin", favourites)
+        self.assertNotRegex(favourites, r"/products/\d+/")
+        self.assertIn(
+            f'href="/products/{product.pk}/">Alpecin</a>',
+            all_products,
         )
 
     def test_empty_catalog_shows_username_and_sign_out_without_product_links(

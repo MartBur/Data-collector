@@ -7,6 +7,7 @@ from prices.views import (
     product_list,
     remove_product,
     remove_shop_page,
+    toggle_favourite,
 )
 
 app_name = "prices"
@@ -20,6 +21,7 @@ urlpatterns = [
     ),
     path("<int:pk>/change/", change_product, name="change_product"),
     path("<int:pk>/remove/", remove_product, name="remove_product"),
+    path("<int:pk>/favourite/", toggle_favourite, name="toggle_favourite"),
     path("<int:pk>/", product_card, name="product_card"),
     path("", product_list, name="product_list"),
 ]

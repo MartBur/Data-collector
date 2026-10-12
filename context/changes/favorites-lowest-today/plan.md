@@ -366,8 +366,8 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 - [x] 1.1 List-price tests pass for today's minimum, a tie, yesterday when today is empty, a gap older than yesterday, the historical-low flag, a superseded same-day amount, and a low older than 30 days: `uv run python manage.py test prices.tests.test_list_prices` — 27c07e2
 - [x] 1.2 Recording-clock tests pass for no finished run, the later finish time, and a completed `record_prices` or per-shop command: `uv run python manage.py test prices.tests.test_recording_clock` — 27c07e2
-- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2 — 27c07e2
-- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2 — 27c07e2
+- [x] 1.3 The recording-run migration applies: `uv run python manage.py migrate` — 27c07e2
+- [x] 1.4 The project test suite passes: `uv run python manage.py test` — 27c07e2
 
 ### Phase 2: Four-table start page
 
@@ -387,12 +387,12 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [ ] 3.1 The favourite migration applies: `uv run python manage.py migrate`
-- [ ] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home`
-- [ ] 3.3 The project test suite passes: `uv run python manage.py test`
+- [x] 3.1 The favourite migration applies: `uv run python manage.py migrate`
+- [x] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home`
+- [x] 3.3 The project test suite passes: `uv run python manage.py test`
 
 #### Manual
 
-- [ ] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
-- [ ] 3.5 Sign in as a second user and confirm the first user's favourites are absent
-- [ ] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
+- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
+- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent
+- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row

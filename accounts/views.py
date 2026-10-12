@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.views import LoginView
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -8,7 +9,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from prices.list_prices import ListPrice, list_prices
-from prices.models import Product
+from prices.models import Favourite, Product
 from prices.recording_clock import latest_recording_finished_at
 
 
@@ -62,6 +63,15 @@ def _home_rows(
     ]
 
 
+def _favourite_product_ids(user: AbstractBaseUser) -> set[int]:
+    """Return the product ids this signed-in user has marked."""
+    product_ids = Favourite.objects.filter(user=user).values_list(
+        "product_id",
+        flat=True,
+    )
+    return {int(product_id) for product_id in product_ids}
+
+
 def _last_price_update_line() -> str:
     """Return the active-timezone finish line, or none when no run is stored."""
     finished_at = latest_recording_finished_at()
@@ -75,7 +85,10 @@ def _last_price_update_line() -> str:
 @never_cache
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
-    """Show four price tables and the last recording time."""
+    """Show four price tables and the last recording time.
+
+    Favourites lists only the signed-in user's marked products.
+    """
     products = _products_for_home()
     prices = list_prices(products, timezone.localdate())
     historical_products = [
@@ -83,10 +96,13 @@ def home(request: HttpRequest) -> HttpResponse:
         for product in products
         if prices[product.pk]["matches_lowest_stored"]
     ]
-    favourites: list[HomePriceRow] = []
+    favourite_ids = _favourite_product_ids(request.user)
+    favourite_products = [
+        product for product in products if product.pk in favourite_ids
+    ]
     context: HomePage = {
         "all_products": _home_rows(products, prices),
-        "favourites": favourites,
+        "favourites": _home_rows(favourite_products, prices),
         "historical_lowest_today": _home_rows(historical_products, prices),
         "lowest_price_today": _home_rows(products, prices),
         "last_price_update": _last_price_update_line(),

@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -159,3 +160,27 @@ class PriceRecordingRun(models.Model):
 
     def __str__(self) -> str:
         return f"finished at {self.finished_at}"
+
+
+class Favourite(models.Model):
+    user: models.ForeignKey = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="favourites",
+    )
+    product: models.ForeignKey = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="favourites",
+    )
+
+    class Meta:
+        constraints: list[models.UniqueConstraint] = [
+            models.UniqueConstraint(
+                fields=("user", "product"),
+                name="prices_favourite_unique_user_product",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} {self.product}"

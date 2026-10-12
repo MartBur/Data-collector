@@ -2,6 +2,7 @@ from decimal import ROUND_CEILING, Decimal
 from typing import TypedDict
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AbstractBaseUser
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Prefetch
 from django.http import HttpRequest, HttpResponse
@@ -12,7 +13,7 @@ from django.views.decorators.http import require_POST
 
 from prices.card import CardFigures, card_figures
 from prices.forms import AddProductForm, ChangeProductForm
-from prices.models import PriceObservation, Product, ShopPage
+from prices.models import Favourite, PriceObservation, Product, ShopPage
 
 _MAX_ADDED_PK: int = 2**63 - 1
 
@@ -354,6 +355,7 @@ class ProductCardPage(TypedDict):
     product: Product
     figures: CardFigures
     chart: ChartPlot
+    is_favourite: bool
 
 
 def _two_decimals(value: Decimal) -> str:
@@ -529,6 +531,28 @@ def _chart_plot(figures: CardFigures) -> ChartPlot:
     }
 
 
+def _is_favourite(user: AbstractBaseUser, product: Product) -> bool:
+    """Return True when this signed-in user has marked the product."""
+    return Favourite.objects.filter(user=user, product=product).exists()
+
+
+@login_required
+@require_POST
+def toggle_favourite(request: HttpRequest, pk: int) -> HttpResponse:
+    """Add this user's favourite, or remove it when it already exists.
+
+    The signed-in user is the only account this post can change.
+    A missing product is not found. GET does not write.
+    """
+    product = get_object_or_404(Product, pk=pk)
+    favourite = Favourite.objects.filter(user=request.user, product=product).first()
+    if favourite is None:
+        Favourite.objects.create(user=request.user, product=product)
+    else:
+        favourite.delete()
+    return redirect("prices:product_card", pk=product.pk)
+
+
 @login_required
 def product_card(request: HttpRequest, pk: int) -> HttpResponse:
     """Show one tracked product's shop prices and 30-day chart."""
@@ -538,5 +562,6 @@ def product_card(request: HttpRequest, pk: int) -> HttpResponse:
         "product": product,
         "figures": figures,
         "chart": _chart_plot(figures),
+        "is_favourite": _is_favourite(request.user, product),
     }
     return render(request, "prices/product_card.html", context)
