@@ -4,14 +4,99 @@
   <meta charset="utf-8">
   <title>Signed in</title>
   <style>
+    body {
+      background: #ffffff;
+      color: #111111;
+    }
     .home-tables {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem 2rem;
+      grid-template-columns: minmax(0, 1fr) 1.5ch minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
       align-items: start;
+      column-gap: 0;
+      row-gap: 0;
+      background: #ffffff;
+      color: #111111;
     }
-    .home-tables table {
+    .home-cross-v,
+    .home-cross-h,
+    .home-cross-joint {
+      font-family: "Courier New", Courier, monospace;
+      line-height: 1;
+      margin: 0;
+      color: #111111;
+      background: #ffffff;
+    }
+    .home-cross-v {
+      position: relative;
+      align-self: stretch;
+      width: 1.5ch;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .home-cross-v span {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: hidden;
+      text-align: center;
+      white-space: pre;
+    }
+    .home-cross-h {
+      align-self: center;
       width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .home-cross-joint {
+      align-self: center;
+      text-align: center;
+    }
+    .ascii-table {
+      width: 100%;
+      font-family: "Courier New", Courier, monospace;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .ascii-table caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .ascii-col-joint {
+      width: 1.2ch;
+    }
+    .ascii-col-data {
+      width: 50%;
+    }
+    .ascii-table td {
+      padding: 0;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .ascii-joint,
+    .ascii-bar {
+      width: 1.2ch;
+      text-align: center;
+    }
+    .ascii-h {
+      overflow: hidden;
+    }
+    .ascii-cell {
+      padding: 0 0.35rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .last-price-update {
+      font-weight: 700;
     }
   </style>
 </head>
@@ -22,60 +107,135 @@
     <p><a href="{% url 'prices:add_product' %}">Add a tracked product</a></p>
     <p><a href="{% url 'prices:product_list' %}">Tracked products</a></p>
   {% endif %}
-  <p>{{ last_price_update }}</p>
+  <p class="last-price-update"><strong>{{ last_price_update }}</strong></p>
   <div class="home-tables">
-    <table>
-      <caption>All products</caption>
-      {% if all_products %}
-        {% for row in all_products %}
-          <tr>
-            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
-            <td>{% if row.price.day == "none" %}No price{% elif row.price.day == "yesterday" %}{{ row.price.amount|stringformat:".2f" }} PLN yesterday{% else %}{{ row.price.amount|stringformat:".2f" }} PLN{% endif %}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr><td></td></tr>
-      {% endif %}
-    </table>
-    <table>
-      <caption>Favourites</caption>
-      {% if favourites %}
-        {% for row in favourites %}
-          <tr>
-            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
-            <td>{% if row.price.day == "none" %}No price{% elif row.price.day == "yesterday" %}{{ row.price.amount|stringformat:".2f" }} PLN yesterday{% else %}{{ row.price.amount|stringformat:".2f" }} PLN{% endif %}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr><td></td></tr>
-      {% endif %}
-    </table>
-    <table>
-      <caption>Historical lowest today</caption>
-      {% if historical_lowest_today %}
-        {% for row in historical_lowest_today %}
-          <tr>
-            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
-            <td>{% if row.price.day == "none" %}No price{% else %}{{ row.price.amount|stringformat:".2f" }} PLN at {% for shop in row.price.shops %}{% if not forloop.first %} and {% endif %}<a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>{% endfor %}{% if row.price.day == "yesterday" %} yesterday{% endif %}{% endif %}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr><td></td></tr>
-      {% endif %}
-    </table>
-    <table>
-      <caption>Lowest price today</caption>
-      {% if lowest_price_today %}
-        {% for row in lowest_price_today %}
-          <tr>
-            <td><a href="{% url 'prices:product_card' row.product.pk %}">{{ row.product.name }}</a></td>
-            <td>{% if row.price.day == "none" %}No price{% else %}{{ row.price.amount|stringformat:".2f" }} PLN at {% for shop in row.price.shops %}{% if not forloop.first %} and {% endif %}<a href="{{ shop.url }}" target="_blank" rel="noopener noreferrer">{{ shop.label }}</a>{% endfor %}{% if row.price.day == "yesterday" %} yesterday{% endif %}{% endif %}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr><td></td></tr>
-      {% endif %}
-    </table>
+    {% include "accounts/home_price_table.html" with caption="All products" rows=all_products with_shops=False %}
+    <div class="home-cross-v" aria-hidden="true"><span>|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|</span></div>
+    {% include "accounts/home_price_table.html" with caption="Favourites" rows=favourites with_shops=False %}
+    <div class="home-cross-h" aria-hidden="true">----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</div>
+    <div class="home-cross-joint" aria-hidden="true">+</div>
+    <div class="home-cross-h" aria-hidden="true">----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</div>
+    {% include "accounts/home_price_table.html" with caption="Historical lowest today" rows=historical_lowest_today with_shops=True %}
+    <div class="home-cross-v" aria-hidden="true"><span>|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|</span></div>
+    {% include "accounts/home_price_table.html" with caption="Lowest price today" rows=lowest_price_today with_shops=True %}
   </div>
   <form method="post" action="{% url 'accounts:logout' %}">
     {% csrf_token %}

@@ -145,9 +145,15 @@ class HomeTests(TestCase):
         self.assertNotIn("DOZ", all_products)
         self.assertNotIn("Gemini", all_products)
         self.assertNotIn("24.00", all_products)
-        self.assertIn("19.99 PLN at Rossmann and DOZ", _visible_text(lowest))
+        self.assertIn("19.99 PLN at Rossmann", _visible_text(lowest))
+        self.assertIn("19.99 PLN at DOZ", _visible_text(lowest))
+        self.assertNotIn(" and ", _visible_text(lowest))
         self.assertNotIn("Gemini", lowest)
         self.assertNotIn("24.00", lowest)
+        self.assertEqual(
+            lowest.count(f'href="/products/{product.pk}/">Citrus</a>'),
+            2,
+        )
         self.assertIn(
             'href="https://www.rossmann.pl/p/citrus" target="_blank" rel="noopener noreferrer">Rossmann</a>',
             lowest,
@@ -156,8 +162,48 @@ class HomeTests(TestCase):
             'href="https://www.doz.pl/p/citrus" target="_blank" rel="noopener noreferrer">DOZ</a>',
             lowest,
         )
-        self.assertLess(lowest.index(">Rossmann</a>"), lowest.index(" and "))
-        self.assertLess(lowest.index(" and "), lowest.index(">DOZ</a>"))
+        self.assertLess(lowest.index(">Rossmann</a>"), lowest.index(">DOZ</a>"))
+
+    def test_manual_shampoo_today_is_15_at_rossmann_and_doz(self) -> None:
+        today = timezone.localdate()
+        product = Product.objects.create(name="Manual shampoo")
+        rossmann = self._page(
+            product,
+            Shop.ROSSMANN,
+            "https://www.rossmann.pl/p/manual-shampoo",
+        )
+        doz = self._page(product, Shop.DOZ, "https://www.doz.pl/p/manual-shampoo")
+        self.assertLess(rossmann.pk, doz.pk)
+        self._observation(rossmann, "15.00", today)
+        self._observation(doz, "15.00", today)
+        self._login()
+
+        body = self._home_body()
+        all_products = _slice_table(body, "All products")
+        lowest = _slice_table(body, "Lowest price today")
+
+        self.assertIn("Manual shampoo", all_products)
+        self.assertIn("15.00 PLN", all_products)
+        self.assertNotIn("Rossmann", all_products)
+        self.assertNotIn("DOZ", all_products)
+        self.assertIn("15.00 PLN at Rossmann", _visible_text(lowest))
+        self.assertIn("15.00 PLN at DOZ", _visible_text(lowest))
+        self.assertNotIn(" and ", _visible_text(lowest))
+        self.assertEqual(
+            lowest.count(f'href="/products/{product.pk}/">Manual shampoo</a>'),
+            2,
+        )
+        self.assertIn("+", lowest)
+        self.assertIn("|", lowest)
+        self.assertIn(
+            'href="https://www.rossmann.pl/p/manual-shampoo" target="_blank" rel="noopener noreferrer">Rossmann</a>',
+            lowest,
+        )
+        self.assertIn(
+            'href="https://www.doz.pl/p/manual-shampoo" target="_blank" rel="noopener noreferrer">DOZ</a>',
+            lowest,
+        )
+        self.assertLess(lowest.index(">Rossmann</a>"), lowest.index(">DOZ</a>"))
 
     def test_yesterday_is_labeled_yesterday_and_is_not_historical(self) -> None:
         product = Product.objects.create(name="Dawn")
@@ -234,6 +280,34 @@ class HomeTests(TestCase):
             historical,
         )
 
+    def test_creme_at_1_today_is_in_historical_lowest(self) -> None:
+        today = timezone.localdate()
+        product = Product.objects.create(name="Creme")
+        rossmann = self._page(
+            product,
+            Shop.ROSSMANN,
+            "https://www.rossmann.pl/p/creme",
+        )
+        self._observation(rossmann, "1.00", today)
+        self._login()
+
+        body = self._home_body()
+        historical = _slice_table(body, "Historical lowest today")
+        all_products = _slice_table(body, "All products")
+
+        self.assertIn("Creme", historical)
+        self.assertIn("1.00 PLN at Rossmann", _visible_text(historical))
+        self.assertIn(
+            'href="https://www.rossmann.pl/p/creme" target="_blank" rel="noopener noreferrer">Rossmann</a>',
+            historical,
+        )
+        self.assertIn(
+            f'href="/products/{product.pk}/">Creme</a>',
+            historical,
+        )
+        self.assertIn("1.00 PLN", all_products)
+        self.assertNotIn("Rossmann", all_products)
+
     def test_favourites_is_one_empty_row_when_products_exist(self) -> None:
         product = Product.objects.create(name="Alpecin")
         self._login()
@@ -242,8 +316,12 @@ class HomeTests(TestCase):
         favourites = _slice_table(body, "Favourites")
 
         self.assertIn("<caption>Favourites</caption>", favourites)
-        self.assertEqual(favourites.count("<tr>"), 1)
-        self.assertIn("<tr><td></td></tr>", favourites)
+        self.assertIn('<td class="ascii-cell ascii-title" colspan="3">Favourites</td>', favourites)
+        self.assertIn("<td class=\"ascii-cell\">_</td>", favourites)
+        self.assertIn('class="home-cross-joint" aria-hidden="true">+</div>', body)
+        self.assertIn("+", favourites)
+        self.assertIn("|", favourites)
+        self.assertIn("-", favourites)
         self.assertNotRegex(favourites, r"/products/\d+/")
         self.assertNotIn("Alpecin", favourites)
         self.assertIn(
@@ -267,8 +345,13 @@ class HomeTests(TestCase):
         for caption in _HOME_CAPTIONS:
             table = _slice_table(body, caption)
             self.assertIn(f"<caption>{caption}</caption>", table)
-            self.assertIn("<tr><td></td></tr>", table)
+            self.assertIn(
+                f'<td class="ascii-cell ascii-title" colspan="3">{caption}</td>',
+                table,
+            )
+            self.assertIn("<td class=\"ascii-cell\">_</td>", table)
             self.assertNotRegex(table, r"/products/\d+/")
+        self.assertIn('class="home-cross-joint" aria-hidden="true">+</div>', body)
 
     def test_staff_still_sees_the_add_product_link(self) -> None:
         self._login(is_staff=True)
@@ -286,7 +369,7 @@ class HomeTests(TestCase):
         for caption in _HOME_CAPTIONS:
             table = _slice_table(body, caption)
             self.assertIn(f"<caption>{caption}</caption>", table)
-            self.assertIn("<tr><td></td></tr>", table)
+            self.assertIn("<td class=\"ascii-cell\">_</td>", table)
             self.assertNotRegex(table, r"/products/\d+/")
 
     def test_last_update_is_none_without_a_recording_run(self) -> None:
@@ -294,7 +377,7 @@ class HomeTests(TestCase):
 
         body = self._home_body()
 
-        self.assertIn("Last price update: none - Warsaw time", body)
+        self.assertIn("<strong>Last price update: none - Warsaw time</strong>", body)
         self.assertLess(
             body.index("Last price update: none - Warsaw time"),
             body.index("<caption>All products</caption>"),
