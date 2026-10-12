@@ -319,6 +319,50 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 
 ---
 
+## Phase 4: Staff price updates
+
+### Overview
+
+A staff user opens Price updates and runs the same recording the management commands use: every shop, or one shop. The finish time updates Last price update. The page works locally and on Render because it calls the recording function inside the web app.
+
+### Changes Required:
+
+#### 1. Shared recording run
+
+**File**: `prices/management/recording_command.py`
+
+**Intent**: The terminal commands and the staff page share one finish path.
+
+**Contract**: `run_price_recording(shop_code, write)` records every tracked page when `shop_code` is `None`, or only that shop. It yields a ten-character progress bar after each page. After the pages return, it stamps the recording clock. A raise before that stamp leaves the previous finish time in place.
+
+#### 2. Staff page
+
+**File**: `prices/urls.py`
+**File**: `prices/views.py`
+**File**: `prices/templates/prices/price_updates.html`
+**File**: `accounts/templates/accounts/home.html`
+
+**Intent**: Only staff can start a recording from the site.
+
+**Contract**: Home shows `Price updates` for staff only, linking to `prices:price_updates` at `products/price-updates/`. The page shows `all shop update` and one button per shop: `Rossmann update`, `DOZ update`, `Super-Pharm update`, `Gemini update`. Each button POSTs and streams a ten-character bar. It starts as `----------`. Each `#` is another 10 percent of the pages in that run, and any remainder rounds up to the next hash. A non-staff user is denied. An anonymous POST redirects to sign-in. An unknown shop does not record. After a finished run the page shows the Warsaw last-update line.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home`
+- Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates`
+- The project test suite passes: `uv run python manage.py test`
+
+#### Manual Verification:
+
+- As staff, open Price updates from the home page and confirm the all-shop button and one button per shop
+- Click all shop update and confirm Last price update shows a Warsaw finish time
+- Sign in as a non-staff user and confirm Price updates is absent
+- Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########`
+
+---
+
 ## Testing Strategy
 
 ### Unit Tests:
@@ -330,6 +374,7 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 
 - `accounts/tests/test_home.py` owns the four captions, phrases, links, empty rows, staff links, and the update line. Page tests build observations relative to `timezone.localdate()`.
 - `prices/tests/test_favourite.py` owns the card POST, the button label, anonymous redirect, and cascade on product delete.
+- `prices/tests/test_price_updates.py` owns the staff recording buttons, a single-shop run, and rejection of an unknown shop.
 
 ### Manual Testing Steps:
 
@@ -338,6 +383,7 @@ The card shows a CSRF form under the product name. The button reads `Add to favo
 3. Use a product with no price today and a price yesterday. Confirm the yesterday label, and that a price from three days ago alone shows `No price`.
 4. Run a recording command and confirm the line shows its Warsaw finish time to the minute. Before any run, confirm the none line.
 5. Add and remove a favourite from the card with two different users.
+6. As staff, run a price update and confirm the bar changes from `----------` to `##########`.
 
 ## Performance Considerations
 
@@ -396,3 +442,18 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 - [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites — 0079680
 - [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent — 0079680
 - [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row — 0079680
+
+### Phase 4: Staff price updates
+
+#### Automated
+
+- [x] 4.1 Price-update tests pass for the staff buttons, a non-staff denial, an anonymous redirect, an all-shop run that stamps the clock, a single-shop run that leaves the other shop untouched, and an unknown shop that records nothing: `uv run python manage.py test prices.tests.test_price_updates accounts.tests.test_home`
+- [x] 4.2 The project test suite passes: `uv run python manage.py test`
+- [x] 4.6 Progress-bar tests pass for a remainder that rounds up to the next tenth, an empty run that fills the bar, and a failed page that still advances it: `uv run python manage.py test prices.tests.test_price_updates`
+
+#### Manual
+
+- [x] 4.3 As staff, open Price updates from the home page and confirm the all-shop button and one button per shop
+- [x] 4.4 Click all shop update and confirm Last price update shows a Warsaw finish time
+- [x] 4.5 Sign in as a non-staff user and confirm Price updates is absent
+- [x] 4.7 Click a price update and confirm the bar starts as `----------`, gains `#` marks as pages finish, and ends as `##########`

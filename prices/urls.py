@@ -3,6 +3,7 @@ from django.urls import path
 from prices.views import (
     add_product,
     change_product,
+    price_updates,
     product_card,
     product_list,
     remove_product,
@@ -14,6 +15,7 @@ app_name = "prices"
 
 urlpatterns = [
     path("add/", add_product, name="add_product"),
+    path("price-updates/", price_updates, name="price_updates"),
     path(
         "<int:pk>/shop-pages/<int:page_pk>/remove/",
         remove_shop_page,

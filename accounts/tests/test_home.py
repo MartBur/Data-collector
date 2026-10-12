@@ -435,6 +435,7 @@ class HomeTests(TestCase):
         self.assertIn("ada", body)
         self.assertIn("Sign out", body)
         self.assertIn('action="/accounts/logout/"', body)
+        self.assertNotIn("Price updates", body)
         self.assertNotRegex(body, r"/products/\d+/")
         positions = [body.index(f"<caption>{caption}</caption>") for caption in _HOME_CAPTIONS]
         self.assertEqual(positions, sorted(positions))
@@ -461,6 +462,8 @@ class HomeTests(TestCase):
         self.assertIn('href="/products/add/"', body)
         self.assertIn("Tracked products", body)
         self.assertIn('href="/products/"', body)
+        self.assertIn("Price updates", body)
+        self.assertIn('href="/products/price-updates/"', body)
         self.assertNotRegex(body, r"/products/\d+/")
         for caption in _HOME_CAPTIONS:
             table = _slice_table(body, caption)
@@ -509,6 +512,7 @@ class HomeTests(TestCase):
             "/",
             "/products/",
             "/products/add/",
+            "/products/price-updates/",
             f"/products/{product.pk}/",
             f"/products/{product.pk}/change/",
         )
