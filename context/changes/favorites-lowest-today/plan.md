@@ -387,12 +387,12 @@ Phase 1 adds `PriceRecordingRun`. Phase 3 adds `Favourite`. Neither backfills. E
 
 #### Automated
 
-- [x] 3.1 The favourite migration applies: `uv run python manage.py migrate`
-- [x] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home`
-- [x] 3.3 The project test suite passes: `uv run python manage.py test`
+- [x] 3.1 The favourite migration applies: `uv run python manage.py migrate` — 0079680
+- [x] 3.2 Favourite and home tests pass for add, remove, a second user, product deletion, and the Favourites table showing only that user's products with the same amount as All products: `uv run python manage.py test prices.tests.test_favourite accounts.tests.test_home` — 0079680
+- [x] 3.3 The project test suite passes: `uv run python manage.py test` — 0079680
 
 #### Manual
 
-- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites
-- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent
-- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row
+- [x] 3.4 On a product card, Add to favourites puts that product in Favourites and leaves it on All products; Remove from favourites clears it from Favourites — 0079680
+- [x] 3.5 Sign in as a second user and confirm the first user's favourites are absent — 0079680
+- [x] 3.6 With tracked products and no favourites, Favourites shows its title and one empty row — 0079680
